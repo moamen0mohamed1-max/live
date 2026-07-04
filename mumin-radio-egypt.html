@@ -48,20 +48,6 @@
     100%{ transform:translate(-26px,-26px); }
   }
 
-  /* hieroglyph frieze bar */
-  .frieze{
-    position:fixed; top:0; left:0; right:0; height:34px; z-index:6;
-    display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(180deg, #2a0b09, transparent);
-    overflow:hidden;
-  }
-  .frieze-row{
-    display:flex; gap:26px; white-space:nowrap;
-    font-size:15px; color:var(--gold-dim); opacity:.8;
-    animation:scrollX 30s linear infinite;
-  }
-  @keyframes scrollX{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
-
   .brand{
     position:fixed; top:44px; right:24px; z-index:6;
     font-family:'Aref Ruqaa', serif; font-size:1.3rem; color:var(--gold-bright);
@@ -176,9 +162,6 @@
 </style>
 </head>
 <body>
-  <div class="frieze">
-    <div class="frieze-row">☥ ☀ 𓅓 ☥ 𓆣 ☀ ☥ 𓂀 ☀ ☥ 𓅓 ☥ 𓆣 ☀ ☥ 𓂀 ☀ ☥ ☀ 𓅓 ☥ 𓆣 ☀ ☥ 𓂀 ☀ ☥ 𓅓 ☥ 𓆣 ☀ ☥ 𓂀 ☀</div>
-  </div>
   <div class="brand"><i class="dot"></i>مؤمن</div>
 
   <div class="cartouche">
