@@ -158,17 +158,11 @@
     position:relative;
     z-index:2;
   }
-  .arch-hood{
-    width:100%;
-    height:64px;
-    display:block;
-  }
   .frame{
     position:relative;
     background:linear-gradient(155deg, var(--navy-light), var(--navy) 60%);
     border:1px solid rgba(201,162,39,.5);
-    border-top:none;
-    border-radius:0 0 18px 18px;
+    border-radius:18px;
     padding:14px;
   }
   .frame::before{
@@ -176,20 +170,55 @@
     position:absolute;
     inset:6px;
     border:1px solid rgba(201,162,39,.18);
-    border-radius:0 0 12px 12px;
+    border-radius:12px;
     pointer-events:none;
   }
   .video-wrap{
     position:relative;
     width:100%;
-    padding-top:56.25%;
+    aspect-ratio:16/9;
     border-radius:8px;
     overflow:hidden;
     background:#000;
   }
   .video-wrap iframe{
-    position:absolute; inset:0; width:100%; height:100%; border:0;
+    position:absolute; inset:0; width:100%; height:100%; border:0; display:block;
   }
+
+  /* Cinema (on-screen) mode */
+  body.cinema{overflow:hidden;}
+  body.cinema .stage{
+    position:fixed;
+    inset:0;
+    z-index:999;
+    max-width:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(3,6,11,.94);
+    margin:0;
+  }
+  body.cinema .stage .frame{
+    width:100%;
+    max-width:1100px;
+  }
+  body.cinema .stage-caption{display:none;}
+  .cinema-close{
+    display:none;
+    position:fixed;
+    top:22px;
+    left:22px;
+    z-index:1000;
+    width:42px;height:42px;
+    border-radius:50%;
+    border:1px solid rgba(201,162,39,.55);
+    background:rgba(12,23,41,.9);
+    color:var(--gold-light);
+    font-size:1.2rem;
+    cursor:pointer;
+  }
+  body.cinema .cinema-close{display:block;}
 
   .stage-caption{
     display:flex;
@@ -208,8 +237,8 @@
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
-    gap:16px;
-    margin:30px 0 0;
+    gap:8px;
+    margin:22px 0 0;
   }
   .btn{
     display:inline-flex;
@@ -286,6 +315,7 @@
     margin-bottom:-1px;
   }
   .card-body{
+    position:relative;
     width:100%;
     border:1px solid var(--card-border, rgba(201,162,39,.4));
     border-top:none;
@@ -293,7 +323,30 @@
     background:rgba(255,255,255,.02);
     padding:28px 20px 26px;
     transition:transform .25s ease, background .25s ease, border-color .25s ease;
+    overflow:hidden;
   }
+
+  /* Rotating neon chase around each card's border */
+  .card-body::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    padding:2px;
+    background:conic-gradient(from 0deg, transparent 0%, transparent 80%, var(--neon, #e14b4b) 92%, transparent 100%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    pointer-events:none;
+    filter:drop-shadow(0 0 6px var(--neon, #e14b4b));
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .card-body::after{ animation:orbit 6s linear infinite; }
+  }
+  @keyframes orbit{ to{ transform:rotate(360deg); } }
+  .card.red{ --neon:#ef3b3b; --card-border:rgba(239,59,59,.45); --card-tint:rgba(239,59,59,.15); --card-color:#ff7a7a; }
+  .card.gold{ --neon:#e8c468; }
+  .card.emerald{ --neon:#2fd39a; --card-border:rgba(28,135,104,.45); --card-tint:rgba(28,135,104,.15); --card-color:var(--emerald-light); }
   .card:hover .card-body{
     transform:translateY(-6px);
     background:rgba(255,255,255,.045);
@@ -322,8 +375,6 @@
     color:var(--card-color, var(--gold-light));
     display:inline-flex; align-items:center; gap:6px;
   }
-  .card.emerald{ --card-border:rgba(28,135,104,.45); --card-tint:rgba(28,135,104,.15); --card-color:var(--emerald-light); }
-
   /* ---------- Footer ---------- */
   footer{
     text-align:center;
@@ -353,14 +404,8 @@
     <h1>البث المباشر<br>للحرمين الشريفين</h1>
     <p class="subtitle">شاهد المسجد الحرام والمسجد النبوي بثًا حيًا بجودة عالية، وتابع الأذان والصلوات وقراءة القرآن الكريم لحظة بلحظة من قلب مكة والمدينة.</p>
 
-    <div class="stage">
-      <svg class="arch-hood" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0,70 C0,26 130,0 200,0 C270,0 400,26 400,70 Z" fill="rgba(21,36,57,1)" stroke="#c9a227" stroke-width="1.5"/>
-        <path d="M0,70 C0,26 130,0 200,0 C270,0 400,26 400,70" fill="none" stroke="#c9a227" stroke-opacity="0.25" stroke-width="1"/>
-        <g transform="translate(200,14)">
-          <path d="M0,-8 L2.2,-2.2 L8,0 L2.2,2.2 L0,8 L-2.2,2.2 L-8,0 L-2.2,-2.2 Z" fill="#e8c468"/>
-        </g>
-      </svg>
+    <button class="cinema-close" id="cinema-close" aria-label="إغلاق">✕</button>
+    <div class="stage" id="stage">
       <div class="frame">
         <div class="video-wrap">
           <iframe src="https://www.youtube.com/embed/_z3sUkvqtEI?rel=0" title="البث المباشر للحرمين الشريفين" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -376,9 +421,9 @@
       <button class="btn solid" id="fullscreen-btn">
         <span>⤢</span> تكبير الشاشة
       </button>
-      <a class="btn" href="https://www.youtube.com/live/_z3sUkvqtEI" target="_blank" rel="noopener">
-        <span>▶</span> فتح في YouTube
-      </a>
+      <button class="btn" id="cinema-btn">
+        <span>▣</span> عرض على الشاشة
+      </button>
     </div>
   </section>
 
@@ -402,7 +447,19 @@
     </div>
 
     <div class="cards">
-      <a class="card" href="https://moamen0mohamed1-max.github.io/live/mumin-haramain-live.html">
+      <a class="card red" href="https://moamen0mohamed1-max.github.io/live/mumin-radio-egypt.html">
+        <svg class="card-arch" viewBox="0 0 70 38" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0,38 C0,14 24,0 35,0 C46,0 70,14 70,38 Z" fill="rgba(255,255,255,.02)" stroke="#ef3b3b" stroke-width="1.2" stroke-opacity=".6"/>
+        </svg>
+        <div class="card-body">
+          <div class="card-icon">📻</div>
+          <h3>إذاعة القرآن الكريم — مصر</h3>
+          <p>إذاعة القاهرة FM 93.1 لتلاوة القرآن الكريم</p>
+          <span class="go">استماع الآن ←</span>
+        </div>
+      </a>
+
+      <a class="card gold" href="https://moamen0mohamed1-max.github.io/live/mumin-haramain-live.html">
         <svg class="card-arch" viewBox="0 0 70 38" preserveAspectRatio="none" aria-hidden="true">
           <path d="M0,38 C0,14 24,0 35,0 C46,0 70,14 70,38 Z" fill="rgba(255,255,255,.02)" stroke="#c9a227" stroke-width="1.2" stroke-opacity=".5"/>
         </svg>
@@ -414,26 +471,14 @@
         </div>
       </a>
 
-      <a class="card" href="https://moamen0mohamed1-max.github.io/live/mumin-radio-saudi.html">
-        <svg class="card-arch" viewBox="0 0 70 38" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0,38 C0,14 24,0 35,0 C46,0 70,14 70,38 Z" fill="rgba(255,255,255,.02)" stroke="#c9a227" stroke-width="1.2" stroke-opacity=".5"/>
-        </svg>
-        <div class="card-body">
-          <div class="card-icon">📻</div>
-          <h3>إذاعة القرآن الكريم — السعودية</h3>
-          <p>بث صوتي مباشر لتلاوات وتفسير من الإذاعة السعودية</p>
-          <span class="go">استماع الآن ←</span>
-        </div>
-      </a>
-
-      <a class="card emerald" href="https://moamen0mohamed1-max.github.io/live/mumin-radio-egypt.html">
+      <a class="card emerald" href="https://moamen0mohamed1-max.github.io/live/mumin-radio-saudi.html">
         <svg class="card-arch" viewBox="0 0 70 38" preserveAspectRatio="none" aria-hidden="true">
           <path d="M0,38 C0,14 24,0 35,0 C46,0 70,14 70,38 Z" fill="rgba(255,255,255,.02)" stroke="#1c8768" stroke-width="1.2" stroke-opacity=".6"/>
         </svg>
         <div class="card-body">
           <div class="card-icon">📻</div>
-          <h3>إذاعة القرآن الكريم — مصر</h3>
-          <p>إذاعة القاهرة FM 93.1 لتلاوة القرآن الكريم</p>
+          <h3>إذاعة القرآن الكريم — السعودية</h3>
+          <p>بث صوتي مباشر لتلاوات وتفسير من الإذاعة السعودية</p>
           <span class="go">استماع الآن ←</span>
         </div>
       </a>
@@ -478,7 +523,17 @@
       document.exitFullscreen?.();
     }
   });
+
+  // Cinema (large on-screen) mode
+  const cinemaBtn = document.getElementById('cinema-btn');
+  const cinemaClose = document.getElementById('cinema-close');
+  function openCinema(){ document.body.classList.add('cinema'); }
+  function closeCinema(){ document.body.classList.remove('cinema'); }
+  cinemaBtn.addEventListener('click', openCinema);
+  cinemaClose.addEventListener('click', closeCinema);
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeCinema(); });
 </script>
 
 </body>
 </html>
+
