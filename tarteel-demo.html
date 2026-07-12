@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ترتيل التجريبي — تتبع التلاوة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B2027;
+    --ink-2:#123640;
+    --teal:#1B4B5A;
+    --gold:#C9A84C;
+    --gold-soft:#e6cf8f;
+    --cream:#F1EAD8;
+    --muted:#8fb0ab;
+    --err:#c06a5f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% -10%, #163f4a 0%, var(--ink) 55%);
+    color:var(--cream);
+    font-family:'Cairo', sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 16px 60px;
+  }
+  header{ text-align:center; margin-bottom:28px; }
+  .eyebrow{
+    color:var(--gold);
+    letter-spacing:.15em;
+    font-size:12px;
+    font-weight:600;
+    text-transform:uppercase;
+  }
+  h1{
+    margin:6px 0 4px;
+    font-size:28px;
+    font-weight:700;
+  }
+  .sub{ color:var(--muted); font-size:14px; max-width:420px; margin:0 auto; line-height:1.7; }
+
+  .card{
+    background:linear-gradient(160deg, var(--ink-2), var(--ink));
+    border:1px solid rgba(201,168,76,.25);
+    border-radius:20px;
+    padding:36px 28px;
+    max-width:560px;
+    width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    position:relative;
+  }
+  .card::before{
+    content:"";
+    position:absolute; inset:8px;
+    border:1px solid rgba(201,168,76,.15);
+    border-radius:14px;
+    pointer-events:none;
+  }
+  .surah-label{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:18px;
+  }
+  .verse{
+    font-family:'Amiri', serif;
+    font-size:34px;
+    line-height:2.3;
+    text-align:center;
+    direction:rtl;
+  }
+  .word{
+    display:inline-block;
+    margin:0 4px;
+    color:#4a6169;
+    transition:color .4s ease, text-shadow .4s ease, transform .3s ease;
+  }
+  .word.done{
+    color:var(--gold-soft);
+    text-shadow:0 0 18px rgba(201,168,76,.55);
+  }
+  .word.active{
+    color:var(--cream);
+    transform:scale(1.05);
+  }
+
+  .beads{
+    display:flex; justify-content:center; gap:7px; margin:26px 0 10px;
+  }
+  .bead{
+    width:9px; height:9px; border-radius:50%;
+    background:rgba(201,168,76,.25);
+    transition:background .3s ease, transform .3s ease;
+  }
+  .bead.on{ background:var(--gold); transform:scale(1.3); }
+
+  .controls{
+    display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:22px;
+  }
+  .mic{
+    width:74px; height:74px; border-radius:50%;
+    border:none; cursor:pointer;
+    background:radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold));
+    box-shadow:0 8px 24px rgba(201,168,76,.35);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .mic:hover{ transform:translateY(-2px); }
+  .mic.listening{
+    animation:pulse 1.4s infinite;
+    background:radial-gradient(circle at 35% 30%, #e28d84, var(--err));
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(192,106,95,.45); }
+    70%{ box-shadow:0 0 0 18px rgba(192,106,95,0); }
+    100%{ box-shadow:0 0 0 0 rgba(192,106,95,0); }
+  }
+  .mic svg{ width:28px; height:28px; fill:var(--ink); }
+
+  .status{ font-size:13px; color:var(--muted); min-height:18px; }
+  .transcript{
+    font-family:'Amiri', serif;
+    direction:rtl;
+    color:var(--muted);
+    font-size:16px;
+    min-height:20px;
+    text-align:center;
+  }
+  .reset{
+    background:none; border:1px solid rgba(201,168,76,.35);
+    color:var(--gold-soft); font-family:'Cairo',sans-serif;
+    font-size:13px; padding:8px 18px; border-radius:999px; cursor:pointer;
+    transition:background .2s ease;
+  }
+  .reset:hover{ background:rgba(201,168,76,.1); }
+
+  .note{
+    max-width:520px; margin-top:26px; font-size:12.5px; color:var(--muted);
+    text-align:center; line-height:1.8; padding:0 12px;
+  }
+  .note b{ color:var(--gold-soft); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Demo · Web Speech API</div>
+  <h1>ترتيل التجريبي</h1>
+  <p class="sub">اضغط على الميكروفون وابدأ التلاوة — الكلمات تُضاء تدريجيًا كل ما تتعرف عليها</p>
+</header>
+
+<div class="card">
+  <div class="surah-label">سورة الإخلاص</div>
+  <div class="verse" id="verse"></div>
+
+  <div class="beads" id="beads"></div>
+
+  <div class="controls">
+    <button class="mic" id="micBtn" aria-label="تشغيل الميكروفون">
+      <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+    </button>
+    <div class="status" id="status">اضغط للبدء</div>
+    <div class="transcript" id="transcript"></div>
+    <button class="reset" id="resetBtn">إعادة الآية</button>
+  </div>
+</div>
+
+<p class="note">
+  هذا عرض تجريبي مجاني يعتمد على خاصية التعرف على الصوت المدمجة في المتصفح (تعمل بشكل أفضل على <b>Chrome</b>)،
+  وهي أقل دقة بكثير من نماذج الذكاء الاصطناعي المدرَّبة خصيصًا على التلاوة القرآنية التي يستخدمها ترتيل الأصلي.
+  يتطلب إذن الوصول للميكروفون.
+</p>
+
+<script>
+const verseWords = ["قُلْ","هُوَ","اللَّهُ","أَحَدٌ","اللَّهُ","الصَّمَدُ"];
+
+function normalize(str){
+  return str
+    .replace(/[\u064B-\u0652\u0670]/g, "")   // remove tashkeel
+    .replace(/[إأآا]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/[^\u0600-\u06FF]/g, "")
+    .trim();
+}
+
+const verseEl = document.getElementById('verse');
+const beadsEl = document.getElementById('beads');
+const statusEl = document.getElementById('status');
+const transcriptEl = document.getElementById('transcript');
+const micBtn = document.getElementById('micBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let matchedCount = 0;
+let listening = false;
+let recognition = null;
+
+function render(){
+  verseEl.innerHTML = verseWords.map((w,i) => {
+    const cls = i < matchedCount ? 'word done' : (i === matchedCount ? 'word active' : 'word');
+    return `<span class="${cls}">${w}</span>`;
+  }).join(' ');
+
+  beadsEl.innerHTML = verseWords.map((_,i) =>
+    `<span class="bead ${i < matchedCount ? 'on':''}"></span>`
+  ).join('');
+}
+
+function tryMatch(transcriptWords){
+  let localIndex = matchedCount;
+  for(const w of transcriptWords){
+    if(localIndex >= verseWords.length) break;
+    if(normalize(w) === normalize(verseWords[localIndex])){
+      localIndex++;
+    }
+  }
+  matchedCount = localIndex;
+  render();
+  if(matchedCount >= verseWords.length){
+    statusEl.textContent = "أحسنت! تمت التلاوة كاملة ✦";
+    stopListening();
+  }
+}
+
+function stopListening(){
+  listening = false;
+  micBtn.classList.remove('listening');
+  if(recognition) recognition.stop();
+}
+
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if(!SpeechRecognitionCtor){
+  statusEl.textContent = "متصفحك لا يدعم التعرف على الصوت — جرّب Chrome";
+  micBtn.disabled = true;
+  micBtn.style.opacity = .4;
+} else {
+  recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'ar-SA';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onresult = (e) => {
+    let interim = "";
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const text = e.results[i][0].transcript;
+      if(e.results[i].isFinal){
+        tryMatch(text.trim().split(/\s+/));
+      } else {
+        interim += text;
+      }
+    }
+    transcriptEl.textContent = interim;
+  };
+
+  recognition.onerror = (e) => {
+    statusEl.textContent = e.error === 'not-allowed'
+      ? "لم يتم منح إذن الميكروفون"
+      : "حدث خطأ في التعرف على الصوت";
+    stopListening();
+  };
+
+  recognition.onend = () => {
+    if(listening){ recognition.start(); } // keep alive while user hasn't stopped manually
+  };
+}
+
+micBtn.addEventListener('click', () => {
+  if(!recognition) return;
+  if(listening){
+    listening = false;
+    micBtn.classList.remove('listening');
+    statusEl.textContent = "توقف الاستماع";
+    recognition.stop();
+  } else {
+    listening = true;
+    micBtn.classList.add('listening');
+    statusEl.textContent = "جاري الاستماع… رتّل الآن";
+    transcriptEl.textContent = "";
+    try{ recognition.start(); }catch(e){}
+  }
+});
+
+resetBtn.addEventListener('click', () => {
+  matchedCount = 0;
+  transcriptEl.textContent = "";
+  statusEl.textContent = "اضغط للبدء";
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
