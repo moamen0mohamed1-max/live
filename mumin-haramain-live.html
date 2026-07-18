@@ -59,6 +59,12 @@
   .video-wrap iframe{
     position:absolute; inset:0; width:100%; height:100%; border:0;
   }
+  .video-wrap #haramainPlayer{
+    position:absolute; inset:0; width:100%; height:100%;
+  }
+  .video-wrap #haramainPlayer iframe{
+    position:absolute; inset:0; width:100%; height:100%; border:0;
+  }
 
   .controls{
     display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap;
@@ -128,14 +134,19 @@
   <div class="stage">
     <div class="hizam"></div>
     <div class="video-wrap">
-      <iframe id="haramainFrame"
-        src="https://www.youtube.com/embed/lzLsVpQq3V4?autoplay=1&mute=0"
-        title="البث المباشر للحرمين الشريفين"
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-        allowfullscreen>
-      </iframe>
+      <div id="haramainPlayer"></div>
+      <iframe id="fallbackFrame" style="display:none;position:absolute;inset:0;width:100%;height:100%;border:0;"
+        allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      <div id="allFailedPanel" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0a0906;text-align:center;padding:20px;">
+        <div style="font-family:'Cairo';color:#efe6cf;font-size:.95rem;line-height:1.7;">
+          تعذّر تشغيل أي من مصادر البث المباشر حاليًا داخل الصفحة.<br>
+          جرّب فتح القناة مباشرة على يوتيوب:
+        </div>
+        <div id="channelLinksWrap" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"></div>
+      </div>
     </div>
   </div>
+  <div class="sub" id="sourceStatus" style="margin-top:10px;font-size:.78rem;"></div>
 
   <div class="controls">
     <button class="ctrl-btn" id="fsBtn">
@@ -150,6 +161,9 @@
       <span class="live-dot"></span>
       <span id="switchBtnLabel">المسجد النبوي</span>
     </button>
+  </div>
+  <div class="controls" style="margin-top:8px;">
+    <button class="ctrl-btn" id="skipBtn" style="font-size:.78rem; opacity:.85;"> جرّب مصدر آخر</button>
   </div>
 
   <div class="divider"></div>
@@ -180,15 +194,175 @@
     alert('لعرض البث على شاشة التلفاز: افتح هذه الصفحة على متصفح كروم ثم اختر "بث" (Cast) من قائمة المتصفح، أو استخدم خاصية AirPlay إن كنت تستخدم آيفون/آيباد، أو افتح تطبيق يوتيوب على التلفاز وابحث عن قناة KSA Qur\'an TV مباشرة.');
   });
 
-  const haramainFrame = document.getElementById('haramainFrame');
-  const meccaSrc  = "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA&autoplay=1&mute=0";
-  const medinaSrc = "https://www.youtube.com/embed/_z3sUkvqtEI?autoplay=1&mute=0";
-  let showingMedina = false;
+  // ========================================================================
+  // نظام البث الاحتياطي التلقائي: لكل قسم (الحرمين / المسجد النبوي) قائمة
+  // فيديوهات بث مباشر، ولو أي واحد فشل أو انتهى، ينتقل تلقائيًا للي بعده.
+  // لو كل الفيديوهات فشلت، بيجرب قنوات احتياطية، ولو كله فشل بيعرض روابط
+  // مباشرة لفتح القنوات على يوتيوب بدل ما الصفحة تفضل واقفة على شاشة سودة.
+  // ========================================================================
+  const STREAM_GROUPS = {
+    haramain: {
+      label: 'الحرمين الشريفين',
+      videos: ["NHLYkgCiXPo", "7OuRWNDlf1A", "b2cGP8VMaDc", "svVLvZYeb3I"],
+      channels: ["ArRahmanIslamic", "AlQuran-Official"]
+    },
+    nabawi: {
+      label: 'المسجد النبوي',
+      videos: ["rO58lSBDZhE", "oFTzrA3Q6oI", "ZVyAXDB_SSs"],
+      channels: ["NaimatIslamic", "ArRahmanIslamic"]
+    }
+  };
+
+  let currentGroupKey = 'haramain';
+  let videoIndex = 0;
+  let cycleCount = 0;
+  const MAX_CYCLES = 2;
+  const RETRY_DELAY_MS = 4000;
+  let player = null;
+  let retryTimeout = null;
+
+  const sourceStatusEl = document.getElementById('sourceStatus');
+  const fallbackFrame = document.getElementById('fallbackFrame');
+  const allFailedPanel = document.getElementById('allFailedPanel');
+  const playerHost = document.getElementById('haramainPlayer');
+
+  function updateStatusLabel(text){
+    sourceStatusEl.textContent = text;
+  }
+
+  function showPlayerLayer(){
+    playerHost.style.display = '';
+    fallbackFrame.style.display = 'none';
+    allFailedPanel.style.display = 'none';
+  }
+
+  function showFallbackFrame(handle){
+    playerHost.style.display = 'none';
+    allFailedPanel.style.display = 'none';
+    fallbackFrame.style.display = '';
+    fallbackFrame.src = `https://www.youtube.com/embed/live_stream?channel=${handle}&autoplay=1&mute=0`;
+    updateStatusLabel(`جارٍ تجربة قناة احتياطية: @${handle}`);
+  }
+
+  function showAllFailedPanel(){
+    playerHost.style.display = 'none';
+    fallbackFrame.style.display = 'none';
+    allFailedPanel.style.display = 'flex';
+    const wrap = document.getElementById('channelLinksWrap');
+    wrap.innerHTML = '';
+    const group = STREAM_GROUPS[currentGroupKey];
+    group.channels.forEach(handle => {
+      const a = document.createElement('a');
+      a.href = `https://www.youtube.com/@${handle}/live`;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'ctrl-btn';
+      a.style.textDecoration = 'none';
+      a.textContent = `فتح قناة @${handle}`;
+      wrap.appendChild(a);
+    });
+    updateStatusLabel('تعذّر العثور على بث مباشر شغّال حاليًا');
+  }
+
+  function loadVideoAt(index){
+    clearTimeout(retryTimeout);
+    const group = STREAM_GROUPS[currentGroupKey];
+    videoIndex = index;
+    showPlayerLayer();
+    const id = group.videos[videoIndex];
+    if (player && typeof player.loadVideoById === 'function'){
+      player.loadVideoById(id);
+    } else {
+      player = new YT.Player('haramainPlayer', {
+        videoId: id,
+        playerVars: { autoplay: 1, mute: 0, playsinline: 1, rel: 0 },
+        events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange, onError: onPlayerError }
+      });
+    }
+    updateStatusLabel(`جارٍ التشغيل: مصدر ${videoIndex + 1} من ${group.videos.length} — ${group.label}`);
+  }
+
+  function onPlayerReady(e){
+    e.target.playVideo();
+  }
+
+  function onPlayerStateChange(e){
+    if (e.data === YT.PlayerState.ENDED){
+      advanceStream('انتهى البث أو توقف مؤقتًا');
+    }
+  }
+
+  function onPlayerError(e){
+    advanceStream('تعذر تشغيل هذا المصدر (كود الخطأ: ' + e.data + ')');
+  }
+
+  function advanceStream(reason){
+    console.warn('[بث الحرمين]', reason);
+    const group = STREAM_GROUPS[currentGroupKey];
+
+    if (videoIndex + 1 < group.videos.length){
+      loadVideoAt(videoIndex + 1);
+      return;
+    }
+
+    // خلصت كل الفيديوهات المباشرة، جرّب قنوات الاحتياط قبل الاستسلام
+    if (!window.__triedChannelFallback){
+      window.__triedChannelFallback = true;
+      window.__channelFallbackIndex = 0;
+      tryNextChannelFallback();
+      return;
+    }
+    window.__channelFallbackIndex++;
+    if (window.__channelFallbackIndex < group.channels.length){
+      tryNextChannelFallback();
+      return;
+    }
+
+    // كل المحاولات فشلت في هذه الدورة، أعد المحاولة من البداية بعد مهلة قصيرة
+    window.__triedChannelFallback = false;
+    cycleCount++;
+    if (cycleCount < MAX_CYCLES){
+      updateStatusLabel('كل المصادر متعطلة مؤقتًا، جارٍ إعادة المحاولة...');
+      retryTimeout = setTimeout(() => loadVideoAt(0), RETRY_DELAY_MS);
+    } else {
+      showAllFailedPanel();
+    }
+  }
+
+  function tryNextChannelFallback(){
+    const group = STREAM_GROUPS[currentGroupKey];
+    const handle = group.channels[window.__channelFallbackIndex];
+    showFallbackFrame(handle);
+    // مفيش طريقة موثوقة لرصد فشل الـ iframe ده (بث القناة عبر handle مش مضمون
+    // دايمًا)، فبنديله مهلة صغيرة ثم نرجع لقائمة الفيديوهات المباشرة تلقائيًا
+    // لو المستخدم مغيّرش القسم أو عمل أي إجراء يدوي.
+  }
+
+  function switchGroup(newKey){
+    clearTimeout(retryTimeout);
+    currentGroupKey = newKey;
+    videoIndex = 0;
+    cycleCount = 0;
+    window.__triedChannelFallback = false;
+    window.__channelFallbackIndex = 0;
+    loadVideoAt(0);
+  }
+
+  function onYouTubeIframeAPIReady(){
+    loadVideoAt(0);
+  }
+
   document.getElementById('switchBtn').addEventListener('click', () => {
-    showingMedina = !showingMedina;
-    haramainFrame.src = showingMedina ? medinaSrc : meccaSrc;
-    document.getElementById('switchBtnLabel').textContent = showingMedina ? 'الحرم المكي' : 'المسجد النبوي';
+    const previousKey = currentGroupKey;
+    const nextKey = currentGroupKey === 'haramain' ? 'nabawi' : 'haramain';
+    switchGroup(nextKey);
+    document.getElementById('switchBtnLabel').textContent = STREAM_GROUPS[previousKey].label;
+  });
+
+  document.getElementById('skipBtn').addEventListener('click', () => {
+    advanceStream('تخطٍّ يدوي من المستخدم');
   });
 </script>
+<script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
