@@ -278,7 +278,36 @@
     </div>
 
     <div class="panel">
-      <h2><span class="num">٤</span> مساعد ذكي (AI)</h2>
+      <h2><span class="num">٤</span> القارئ وصوت التلاوة</h2>
+      <div class="row">
+        <div style="flex:2;">
+          <label>السورة</label>
+          <select id="surahSelect"></select>
+        </div>
+        <div>
+          <label>من آية</label>
+          <input type="text" id="ayahFrom" value="1" inputmode="numeric">
+        </div>
+        <div>
+          <label>إلى آية</label>
+          <input type="text" id="ayahTo" value="1" inputmode="numeric">
+        </div>
+      </div>
+      <label>القارئ</label>
+      <select id="reciterSelect"></select>
+      <div class="btn-row">
+        <button class="btn-ghost" id="fetchAyahBtn" style="flex:1;">📖 جلب نص الآية وتلاوتها</button>
+      </div>
+      <audio id="reciterAudio" controls style="width:100%;margin-top:12px;display:none;" crossorigin="anonymous"></audio>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;">
+        <input type="checkbox" id="includeAudioInRecording" checked style="width:auto;">
+        <span style="color:var(--cream);">تضمين صوت التلاوة عند تسجيل الفيديو</span>
+      </label>
+      <p class="metaNote" id="audioNote">يجلب هذا القسم نص الآية تلقائيًا من alquran.cloud وصوت التلاوة من everyayah.com بحسب السورة والقارئ المختارَين. راجع دائمًا النص المجلوب قبل النشر.</p>
+    </div>
+
+    <div class="panel">
+      <h2><span class="num">٥</span> مساعد ذكي (AI)</h2>
       <div class="aiBox">
         <label style="margin-top:0;">اكتب الموضوع أو الشعور الذي تريد التعبير عنه</label>
         <input type="text" id="aiMood" placeholder="مثال: الصبر عند الابتلاء">
@@ -290,14 +319,14 @@
           <button class="btn-primary" id="aiApply" style="width:auto;padding:8px 14px;">تطبيق الاقتراح</button>
         </div>
       </div>
-      <p class="metaNote">يستخدم المساعد نموذج Claude لاقتراح عنوان وتأمل نصي وخلفية مناسبة فقط — ولا يقوم بتوليد نص قرآني جديد بأي حال.</p>
+      <p class="metaNote">يستخدم المساعد نموذج Claude لاقتراح عنوان وتأمل نصي وخلفية مناسبة فقط — ولا يقوم بتوليد نص قرآني جديد بأي حال. ⚠️ يعمل هذا القسم فقط عند تشغيل الصفحة كـ"Artifact" حيّ داخل محادثة على claude.ai؛ لن يعمل إذا فتحت الملف محليًا أو استضفته على خادمك الخاص دون مفتاح API خاص بك.</p>
     </div>
   </div>
 
   <!-- ========== PREVIEW ========== -->
   <div class="previewWrap">
     <div class="panel">
-      <h2><span class="num">٥</span> المعاينة والتصدير</h2>
+      <h2><span class="num">٦</span> المعاينة والتصدير</h2>
       <div class="stage">
         <canvas id="stageCanvas" width="1280" height="720"></canvas>
         <div class="recDot" id="recDot"><span class="dot"></span> تسجيل…</div>
@@ -320,7 +349,7 @@
       </div>
 
       <p class="metaNote">
-        يتم التسجيل مباشرة من المعاينة بدقة ثابتة 1280×720 (720p) وبمعدل 30 إطارًا/ثانية، وتُصدَّر بصيغة WebM القابلة للتشغيل والتحويل في أغلب المشغلات وبرامج المونتاج. لتحويلها إلى MP4 يمكن استخدام أي محول فيديو مجاني إن لزم الأمر.
+        يتم التسجيل مباشرة من المعاينة بدقة ثابتة 1280×720 (720p) وبمعدل 30 إطارًا/ثانية، وتُصدَّر بصيغة WebM القابلة للتشغيل والتحويل في أغلب المشغلات وبرامج المونتاج. لتحويلها إلى MP4 يمكن استخدام أي محول فيديو مجاني إن لزم الأمر. إذا فعّلت "تضمين صوت التلاوة" وجلبت الآية أولًا، سيبدأ صوت القارئ مع بدء التسجيل ويُضمَّن في نفس ملف الفيديو؛ إن رفض المتصفح تضمينه لأسباب تتعلق بسياسات الخادم المضيف للصوت، سيُسجَّل الفيديو بدون صوت وستظهر رسالة بذلك في الطرفية (Console).
       </p>
     </div>
   </div>
@@ -346,6 +375,83 @@ let state = {
   bg: 'sunset',
   speed: parseFloat(document.getElementById('animSpeed').value)
 };
+
+// ---------------------------------------------------------------
+// SURAHS (names + ayah counts) — used for the surah/ayah pickers
+// ---------------------------------------------------------------
+const SURAHS = [
+["الفاتحة",7],["البقرة",286],["آل عمران",200],["النساء",176],["المائدة",120],["الأنعام",165],
+["الأعراف",206],["الأنفال",75],["التوبة",129],["يونس",109],["هود",123],["يوسف",111],
+["الرعد",43],["إبراهيم",52],["الحجر",99],["النحل",128],["الإسراء",111],["الكهف",110],
+["مريم",98],["طه",135],["الأنبياء",112],["الحج",78],["المؤمنون",118],["النور",64],
+["الفرقان",77],["الشعراء",227],["النمل",93],["القصص",88],["العنكبوت",69],["الروم",60],
+["لقمان",34],["السجدة",30],["الأحزاب",73],["سبأ",54],["فاطر",45],["يس",83],
+["الصافات",182],["ص",88],["الزمر",75],["غافر",85],["فصلت",54],["الشورى",53],
+["الزخرف",89],["الدخان",59],["الجاثية",37],["الأحقاف",35],["محمد",38],["الفتح",29],
+["الحجرات",18],["ق",45],["الذاريات",60],["الطور",49],["النجم",62],["القمر",55],
+["الرحمن",78],["الواقعة",96],["الحديد",29],["المجادلة",22],["الحشر",24],["الممتحنة",13],
+["الصف",14],["الجمعة",11],["المنافقون",11],["التغابن",18],["الطلاق",12],["التحريم",12],
+["الملك",30],["القلم",52],["الحاقة",52],["المعارج",44],["نوح",28],["الجن",28],
+["المزمل",20],["المدثر",56],["القيامة",40],["الإنسان",31],["المرسلات",50],["النبأ",40],
+["النازعات",46],["عبس",42],["التكوير",29],["الانفطار",19],["المطففين",36],["الانشقاق",25],
+["البروج",22],["الطارق",17],["الأعلى",19],["الغاشية",26],["الفجر",30],["البلد",20],
+["الشمس",15],["الليل",21],["الضحى",11],["الشرح",8],["التين",8],["العلق",19],
+["القدر",5],["البينة",8],["الزلزلة",8],["العاديات",11],["القارعة",11],["التكاثر",8],
+["العصر",3],["الهمزة",9],["الفيل",5],["قريش",4],["الماعون",7],["الكوثر",3],
+["الكافرون",6],["النصر",3],["المسد",5],["الإخلاص",4],["الفلق",5],["الناس",6]
+];
+
+// ---------------------------------------------------------------
+// RECITERS — folder ids match everyayah.com/data/{id}/SSSAAA.mp3
+// ---------------------------------------------------------------
+const RECITERS = [
+["Alafasy_128kbps","مشاري راشد العفاسي"],
+["Husary_128kbps","محمود خليل الحصري (مرتل)"],
+["Husary_128kbps_Mujawwad","محمود خليل الحصري (مجوّد)"],
+["Husary_Muallim_128kbps","محمود خليل الحصري (معلّم)"],
+["Abdul_Basit_Murattal_192kbps","عبد الباسط عبد الصمد (مرتل)"],
+["Abdul_Basit_Mujawwad_128kbps","عبد الباسط عبد الصمد (مجوّد)"],
+["Minshawy_Murattal_128kbps","محمد صديق المنشاوي (مرتل)"],
+["Minshawy_Mujawwad_192kbps","محمد صديق المنشاوي (مجوّد)"],
+["Abdurrahmaan_As-Sudais_192kbps","عبد الرحمن السديس"],
+["Saood_ash-Shuraym_128kbps","سعود الشريم"],
+["Hudhaify_128kbps","علي بن عبد الرحمن الحذيفي"],
+["MaherAlMuaiqly128kbps","ماهر المعيقلي"],
+["Abdullah_Basfar_192kbps","عبد الله بصفر"],
+["Abu_Bakr_Ash-Shaatree_128kbps","أبو بكر الشاطري"],
+["Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net","أحمد بن علي العجمي"],
+["Muhammad_Ayyoub_128kbps","محمد أيوب"],
+["Muhammad_Jibreel_128kbps","محمد جبريل"],
+["Mohammad_al_Tablaway_128kbps","محمد الطبلاوي"],
+["Hani_Rifai_192kbps","هاني الرفاعي"],
+["Yasser_Ad-Dussary_128kbps","ياسر الدوسري"],
+["Nasser_Alqatami_128kbps","ناصر القطامي"],
+["Muhsin_Al_Qasim_192kbps","محسن القاسم"],
+["Salah_Al_Budair_128kbps","صلاح البدير"],
+["Salaah_AbdulRahman_Bukhatir_128kbps","صلاح عبد الرحمن بخاطر"],
+["Fares_Abbad_64kbps","فارس عباد"],
+["Ali_Jaber_64kbps","علي جابر"],
+["Ali_Hajjaj_AlSuesy_128kbps","علي حجاج السويسي"],
+["Ayman_Sowaid_64kbps","أيمن سويد"],
+["Ibrahim_Akhdar_32kbps","إبراهيم الأخضر"],
+["Abdullaah_3awwaad_Al-Juhaynee_128kbps","عبد الله عواد الجهني"],
+["Abdullah_Matroud_128kbps","عبد الله مطرود"],
+["Ahmed_Neana_128kbps","أحمد نعينع"],
+["Akram_AlAlaqimy_128kbps","أكرم العلاقمي"],
+["aziz_alili_128kbps","عزيز عليلي"],
+["Khaalid_Abdullaah_al-Qahtaanee_192kbps","خالد عبد الله القحطاني"],
+["khalefa_al_tunaiji_64kbps","خليفة التنيجي"],
+["mahmoud_ali_al_banna_32kbps","محمود علي البنا"],
+["Muhammad_AbdulKareem_128kbps","محمد عبد الكريم"],
+["Nabil_Rifa3i_48kbps","نبيل الرفاعي"],
+["Sahl_Yassin_128kbps","سهل ياسين"],
+["Yaser_Salamah_128kbps","ياسر سلامة"],
+["Ghamadi_40kbps","سعد الغامدي"],
+["Karim_Mansoori_40kbps","كريم منصوري"],
+["Muhammad_Ayyoub_32kbps","محمد أيوب (32kbps)"],
+["Hudhaify_64kbps","علي الحذيفي (64kbps)"],
+["Abdullah_Basfar_64kbps","عبد الله بصفر (64kbps)"]
+];
 
 const samples = {
   basmalah: { verse:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', source:'الفاتحة ١' },
@@ -375,6 +481,98 @@ $('fontSelect').addEventListener('change', e => state.font = e.target.value);
 $('fontSize').addEventListener('input', e => { state.fontSize = parseInt(e.target.value,10); $('fontSizeVal').textContent = state.fontSize; });
 $('textColor').addEventListener('input', e => state.textColor = e.target.value);
 $('animSpeed').addEventListener('input', e => state.speed = parseFloat(e.target.value));
+
+// ---------------------------------------------------------------
+// SURAH / RECITER PICKERS + AYAH TEXT & AUDIO FETCH
+// ---------------------------------------------------------------
+const surahSelect = $('surahSelect');
+SURAHS.forEach((s,i)=>{
+  const opt = document.createElement('option');
+  opt.value = i+1;
+  opt.textContent = (i+1)+'. '+s[0]+' ('+s[1]+' آية)';
+  surahSelect.appendChild(opt);
+});
+
+const reciterSelect = $('reciterSelect');
+RECITERS.forEach(r=>{
+  const opt = document.createElement('option');
+  opt.value = r[0];
+  opt.textContent = r[1];
+  reciterSelect.appendChild(opt);
+});
+
+function pad3(n){ return String(n).padStart(3,'0'); }
+
+const reciterAudio = $('reciterAudio');
+let audioQueue = [];
+let audioQueueIndex = 0;
+let audioSourceNode = null;
+let audioDestNode = null;
+let sharedAudioCtx = null;
+
+function buildAudioQueue(surahNum, from, to, reciterId){
+  const list = [];
+  for(let a=from; a<=to; a++){
+    list.push('https://everyayah.com/data/'+reciterId+'/'+pad3(surahNum)+pad3(a)+'.mp3');
+  }
+  return list;
+}
+
+reciterAudio.addEventListener('ended', ()=>{
+  audioQueueIndex++;
+  if(audioQueueIndex < audioQueue.length){
+    reciterAudio.src = audioQueue[audioQueueIndex];
+    reciterAudio.play().catch(()=>{});
+  } else if(recorder && recorder.state === 'recording' && $('durationSelect').value === '0'){
+    // manual-stop mode: end recording automatically once the recitation finishes
+    stopRecording();
+  }
+});
+
+$('fetchAyahBtn').addEventListener('click', async ()=>{
+  const surahNum = parseInt(surahSelect.value,10);
+  const surahInfo = SURAHS[surahNum-1];
+  let from = parseInt($('ayahFrom').value,10) || 1;
+  let to = parseInt($('ayahTo').value,10) || from;
+  if(from < 1) from = 1;
+  if(to > surahInfo[1]) to = surahInfo[1];
+  if(to < from) to = from;
+  $('ayahFrom').value = from;
+  $('ayahTo').value = to;
+
+  const btn = $('fetchAyahBtn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = 'جاري الجلب <span class="spinner" style="border-top-color:var(--gold-light);"></span>';
+
+  try{
+    const res = await fetch('https://api.alquran.cloud/v1/surah/'+surahNum+'/quran-uthmani');
+    const data = await res.json();
+    if(!data || data.code !== 200) throw new Error('bad response');
+    const ayahs = data.data.ayahs; // array indexed 0..n-1
+    const picked = ayahs.slice(from-1, to);
+    const arabicIndicNums = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    const toArabicNum = n => String(n).split('').map(d=>arabicIndicNums[+d]).join('');
+    const verseText = picked.map(a => a.text + ' ﴿' + toArabicNum(a.numberInSurah) + '﴾').join(' ');
+    const sourceLabel = surahInfo[0] + ' ' + (from===to ? toArabicNum(from) : toArabicNum(from)+'-'+toArabicNum(to));
+
+    $('verseText').value = verseText;
+    $('sourceLabel').value = sourceLabel;
+    state.verse = verseText;
+    state.source = sourceLabel;
+
+    audioQueue = buildAudioQueue(surahNum, from, to, reciterSelect.value);
+    audioQueueIndex = 0;
+    reciterAudio.src = audioQueue[0];
+    reciterAudio.style.display = 'block';
+  }catch(err){
+    console.error(err);
+    alert('تعذّر جلب نص الآية أو صوتها الآن. تحقّق من الاتصال بالإنترنت وحاول مرة أخرى.');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+});
 
 document.querySelectorAll('.chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
@@ -612,48 +810,60 @@ function render(t){
 
   drawFrame();
 
-  // verse text, auto-fit
+  // verse text + translation, auto-fit into a safe zone that never
+  // overlaps the source label or the frame
   ctx.direction = 'rtl';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  let size = state.fontSize;
-  let lines = [];
   const maxWidth = W*0.72;
+  const translationFont = '22px Cairo, sans-serif';
+  const translationLineHeight = 30;
+  const topBound = H*0.16;
+  const bottomBound = state.source ? H*0.84 : H*0.92;
+  const availH = bottomBound - topBound;
+
+  let size = state.fontSize;
+  let verseLines = [], verseLineHeight = 0, translationLines = [], blockH = 0;
   do{
-    lines = wrapArabic(state.verse || '', size+'px '+state.font, maxWidth);
-    if(lines.length <= 4) break;
-    size -= 3;
-  } while(size > 24);
+    verseLines = wrapArabic(state.verse || '', size+'px '+state.font, maxWidth);
+    verseLineHeight = size*1.9; // generous spacing so tashkeel/diacritics never collide
+    translationLines = state.translation ? wrapArabic(state.translation, translationFont, maxWidth) : [];
+    blockH = verseLines.length*verseLineHeight + (translationLines.length ? 24 + translationLines.length*translationLineHeight : 0);
+    if(blockH <= availH && verseLines.length <= 7) break;
+    size -= 2;
+  } while(size > 20);
 
   ctx.font = size+'px '+state.font;
   ctx.fillStyle = state.textColor;
   ctx.shadowColor = 'rgba(0,0,0,.55)';
   ctx.shadowBlur = 14;
-  const lineHeight = size*1.55;
-  const totalH = lines.length*lineHeight;
-  let y = H/2 - totalH/2 + lineHeight/2 - (state.translation ? 20:0);
-  lines.forEach(line=>{
+  let y = topBound + (availH - blockH)/2 + verseLineHeight/2;
+  verseLines.forEach(line=>{
     ctx.fillText(line, W/2, y);
-    y += lineHeight;
+    y += verseLineHeight;
   });
   ctx.shadowBlur = 0;
 
-  // translation / reflection
-  if(state.translation){
-    ctx.font = '22px Cairo, sans-serif';
+  // translation / reflection (wrapped, never overlaps the verse or source)
+  if(translationLines.length){
+    y += 24 - verseLineHeight/2 + translationLineHeight/2;
+    ctx.font = translationFont;
     ctx.fillStyle = 'rgba(242,234,214,.88)';
     ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=8;
-    ctx.fillText(state.translation, W/2, y+14);
+    translationLines.forEach(line=>{
+      ctx.fillText(line, W/2, y);
+      y += translationLineHeight;
+    });
     ctx.shadowBlur = 0;
   }
 
-  // source label
+  // source label — always pinned near the bottom, outside the text's safe zone
   if(state.source){
     ctx.font = '18px Cairo, sans-serif';
     ctx.fillStyle = 'rgba(232,199,102,.9)';
     ctx.textAlign = 'center';
-    ctx.fillText('﴿ '+state.source+' ﴾', W/2, H-64);
+    ctx.fillText('﴿ '+state.source+' ﴾', W/2, H-56);
   }
 }
 
@@ -680,9 +890,33 @@ $('recordBtn').addEventListener('click', ()=>{
     return;
   }
   chunks = [];
-  const stream = canvas.captureStream(30); // fixed 30fps @ 1280x720 canvas
+  const videoStream = canvas.captureStream(30); // fixed 30fps @ 1280x720 canvas
+  let finalStream = videoStream;
+
+  const wantsAudio = $('includeAudioInRecording').checked && audioQueue.length > 0;
+  if(wantsAudio){
+    try{
+      if(!sharedAudioCtx) sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(!audioSourceNode){
+        audioSourceNode = sharedAudioCtx.createMediaElementSource(reciterAudio);
+        audioDestNode = sharedAudioCtx.createMediaStreamDestination();
+        audioSourceNode.connect(audioDestNode);
+        audioSourceNode.connect(sharedAudioCtx.destination); // keep it audible too
+      }
+      if(sharedAudioCtx.state === 'suspended') sharedAudioCtx.resume();
+      finalStream = new MediaStream([...videoStream.getVideoTracks(), ...audioDestNode.stream.getAudioTracks()]);
+      audioQueueIndex = 0;
+      reciterAudio.currentTime = 0;
+      reciterAudio.src = audioQueue[0];
+      reciterAudio.play().catch(()=>{});
+    }catch(err){
+      console.error('تعذّر تضمين الصوت في التسجيل، سيتم التسجيل بدون صوت:', err);
+      finalStream = videoStream;
+    }
+  }
+
   const mime = pickMime();
-  recorder = new MediaRecorder(stream, mime ? {mimeType:mime, videoBitsPerSecond: 4_000_000} : undefined);
+  recorder = new MediaRecorder(finalStream, mime ? {mimeType:mime, videoBitsPerSecond: 4_000_000} : undefined);
   recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
   recorder.onstop = () => {
     const blob = new Blob(chunks, {type: mime || 'video/webm'});
@@ -715,6 +949,7 @@ $('stopBtn').addEventListener('click', stopRecording);
 function stopRecording(){
   if(stopTimer) clearTimeout(stopTimer);
   if(recorder && recorder.state !== 'inactive') recorder.stop();
+  if(!reciterAudio.paused) reciterAudio.pause();
   $('recordBtn').style.display = 'inline-block';
   $('recordBtn').disabled = false;
   $('recordBtn').textContent = '⏺ تسجيل الفيديو';
@@ -765,7 +1000,7 @@ $('aiBtn').addEventListener('click', async ()=>{
     $('aiResult').dataset.reflection = parsed.reflection || '';
   }catch(err){
     console.error(err);
-    alert('تعذّر الحصول على اقتراح الآن. حاول مرة أخرى.');
+    alert('تعذّر الحصول على اقتراح الآن.\n\nهذه الميزة تعمل فقط عندما تُفتح الصفحة كـ"Artifact" حيّ داخل محادثة على claude.ai — عندها تُوجَّه الطلبات تلقائيًا دون الحاجة لمفتاح API. أما عند فتح هذا الملف كصفحة HTML عادية على جهازك أو استضافته بنفسك، فلن يعمل الطلب لأن نقطة api.anthropic.com تتطلب مصادقة من خادم، وليست مخصّصة للاستدعاء المباشر من المتصفح. يمكنك تجاهل هذا القسم واستخدام بقية الأداة بشكل طبيعي.');
   }finally{
     btn.disabled = false;
     btn.textContent = originalLabel;
