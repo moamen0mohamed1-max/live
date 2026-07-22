@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>التسبيح — مؤمن</title>
+<title>السبحة — المؤمن</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -28,9 +28,37 @@
     touch-action: manipulation;
   }
   header{ padding: max(18px, env(safe-area-inset-top)) 20px 6px; display:flex; align-items:center; justify-content:space-between; }
-  .brand{ font-size:13px; letter-spacing:.12em; color:var(--muted); }
-  .brand b{ color:var(--gold); font-weight:700; }
+  .brand{ font-size:17px; letter-spacing:.12em; color:var(--muted); }
+  .brand b{
+    font-family:'Reem Kufi',sans-serif; font-weight:500; letter-spacing:.06em;
+    background:linear-gradient(120deg, #a9822a 0%, var(--gold-bright) 35%, #fff3cf 50%, var(--gold-bright) 65%, #a9822a 100%);
+    background-size:220% auto;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 14px rgba(232,199,102,.35);
+    animation: shimmer 5s ease-in-out infinite;
+  }
+  @keyframes shimmer{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
   h1{ font-family:'Reem Kufi',sans-serif; font-size:20px; margin:0; font-weight:500; color:var(--ink); text-align:center; flex:1; }
+  .header-controls{ display:flex; align-items:center; gap:8px; }
+  #modeBtn{
+    background:rgba(80,220,190,.06); border:1px solid #4fd8c4; color:#4fd8c4;
+    font-family:'Tajawal',sans-serif; font-size:12px; padding:7px 12px; border-radius:999px; cursor:pointer;
+    text-shadow:0 0 6px rgba(79,216,196,.6), 0 0 14px rgba(79,216,196,.6);
+    box-shadow:0 0 8px rgba(79,216,196,.3), inset 0 0 8px rgba(79,216,196,.1);
+    transition: transform .15s, box-shadow .2s, background .2s, color .2s;
+  }
+  #modeBtn:active{ transform:scale(.96); }
+  #modeBtn:focus-visible{ outline:2px solid #4fd8c4; outline-offset:2px; }
+  #modeBtn.active{
+    color:#04140f; background:#4fd8c4; border-color:#4fd8c4;
+    text-shadow:none;
+    box-shadow:0 0 16px rgba(79,216,196,.65), 0 0 32px rgba(79,216,196,.5);
+  }
+
   #resetBtn{
     background:rgba(255,43,69,.06); border:1px solid var(--neon-red); color:var(--neon-red);
     font-family:'Tajawal',sans-serif; font-size:12px; padding:7px 12px; border-radius:999px; cursor:pointer;
@@ -40,35 +68,71 @@
   }
   #resetBtn:active{ transform:scale(.96); }
   #resetBtn:focus-visible{ outline:2px solid var(--neon-red); outline-offset:2px; }
-  #resetBtn.confirm{
-    color:#fff; background:var(--neon-red); border-color:var(--neon-red);
-    text-shadow:0 0 8px rgba(255,255,255,.7);
-    box-shadow:0 0 16px var(--neon-red-glow), 0 0 32px var(--neon-red-glow);
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(5,7,9,.72); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center; z-index:50;
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    background:#14181c; border:1px solid rgba(255,255,255,.08); border-radius:18px;
+    padding:24px 22px; width:min(84vw, 300px); text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);
+  }
+  .modal-box p{ font-family:'Reem Kufi',sans-serif; font-size:16px; color:var(--ink); margin:0 0 18px; }
+  .modal-actions{ display:flex; gap:12px; }
+  .modal-actions button{
+    flex:1; font-family:'Tajawal',sans-serif; font-size:14px; font-weight:700;
+    padding:11px 8px; border-radius:12px; cursor:pointer; transition: transform .15s, opacity .2s, box-shadow .2s;
+  }
+  .modal-actions button:active{ transform:scale(.96); }
+  #cancelBtn{
+    background:rgba(255,43,69,.1); border:1px solid var(--neon-red); color:var(--neon-red);
+    text-shadow:0 0 6px var(--neon-red-glow);
+    box-shadow:0 0 8px rgba(255,43,69,.3), inset 0 0 8px rgba(255,43,69,.1);
+  }
+  #confirmBtn{
+    background:rgba(60,210,120,.1); border:1px solid #3cd278; color:#3cd278;
+    text-shadow:0 0 6px rgba(60,210,120,.55);
+    box-shadow:0 0 8px rgba(60,210,120,.3), inset 0 0 8px rgba(60,210,120,.1);
+  }
+  #confirmBtn:disabled{
+    opacity:.45; cursor:not-allowed; box-shadow:none; text-shadow:none;
   }
 
   main{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px 20px 0; gap:18px; }
 
-  .ring-wrap{
-    position:relative; width:min(64vw, 260px); aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
-    border-radius:50%;
-    box-shadow:0 0 0 1px rgba(201,162,39,.35), 0 0 18px rgba(201,162,39,.25), inset 0 0 20px rgba(201,162,39,.08);
-  }
-  svg.ring{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
+  .ring-wrap{ position:relative; width:min(64vw, 260px); aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; }
+  svg.ring{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); overflow:visible; }
   .ring-track{ fill:none; stroke:var(--ring-track); stroke-width:4; }
-  .ring-progress{ fill:none; stroke:var(--gold); stroke-width:4; stroke-linecap:round; transition: stroke-dashoffset .18s ease-out; filter:drop-shadow(0 0 6px rgba(201,162,39,.55)); }
+  .ring-progress{ fill:none; stroke:var(--gold); stroke-width:4; stroke-linecap:round; transition: stroke-dashoffset .18s ease-out, stroke .2s, filter .2s; filter:drop-shadow(0 0 6px rgba(201,162,39,.55)); }
+  body.unlimited-mode .ring-progress{ stroke:#4fd8c4; filter:drop-shadow(0 0 8px rgba(79,216,196,.75)); }
 
   .count{ font-family:'Reem Kufi',sans-serif; font-size:clamp(56px, 18vw, 92px); line-height:1; color:var(--ink); font-weight:700; letter-spacing:.02em; }
   .count-label{ position:absolute; bottom:14%; font-size:12px; color:var(--muted); letter-spacing:.08em; }
 
-  .stats{ display:flex; gap:16px; }
-  .stat{
-    text-align:center; padding:10px 20px; border-radius:14px;
-    border:1px solid rgba(201,162,39,.4);
-    background:rgba(201,162,39,.05);
-    box-shadow:0 0 10px rgba(201,162,39,.3), inset 0 0 12px rgba(201,162,39,.08);
+  .stats{
+    display:flex; position:relative;
+    padding:2px; border-radius:18px;
+    background:linear-gradient(160deg, rgba(232,199,102,.5), rgba(201,162,39,.08) 40%, rgba(201,162,39,.25));
+    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 18px rgba(201,162,39,.15);
   }
-  .stat .num{ font-family:'Reem Kufi',sans-serif; font-size:22px; color:var(--gold-bright); text-shadow:0 0 8px rgba(232,199,102,.6); }
-  .stat .lbl{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .stat{
+    position:relative; text-align:center; padding:14px 30px 12px; min-width:104px;
+    border-radius:16px;
+    background:linear-gradient(180deg, #1a1e22, #14171a);
+  }
+  .stat + .stat::before{
+    content:''; position:absolute; right:100%; top:14%; bottom:14%; width:1px;
+    background:linear-gradient(180deg, transparent, rgba(201,162,39,.45), transparent);
+  }
+  .stat .num{
+    font-family:'Reem Kufi',sans-serif; font-size:26px; color:var(--gold-bright);
+    text-shadow:0 0 10px rgba(232,199,102,.65), 0 0 24px rgba(232,199,102,.25);
+    letter-spacing:.02em;
+  }
+  .stat .lbl{ font-size:10.5px; color:var(--muted); margin-top:4px; letter-spacing:.04em; }
 
   .dhikr-label{ font-size:14px; color:var(--muted); text-align:center; max-width:280px; }
 
@@ -93,6 +157,7 @@
     .pulse-ring{ animation:none; }
     .ripple{ animation:none; opacity:0; }
     .ring-progress{ transition:none; }
+    .brand b{ animation:none; }
   }
 
   .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
@@ -100,9 +165,12 @@
 </head>
 <body>
   <header>
-    <button id="resetBtn" type="button">إعادة الضبط</button>
-    <h1>سبحة التسبيح</h1>
-    <span class="brand"><b>مؤمن</b></span>
+    <div class="header-controls">
+      <button id="resetBtn" type="button">إعادة الضبط</button>
+      <button id="modeBtn" type="button">بدون حد</button>
+    </div>
+    <h1>السبحة</h1>
+    <span class="brand"><b>المؤمن</b></span>
   </header>
 
   <main>
@@ -112,7 +180,7 @@
         <circle id="ringProgress" class="ring-progress" cx="50" cy="50" r="46" stroke-dasharray="289" stroke-dashoffset="289"></circle>
       </svg>
       <div class="count" id="countDisplay">٠</div>
-      <div class="count-label">من ٣٣</div>
+      <div class="count-label" id="countLabel">من ٣٣</div>
     </div>
 
     <div class="stats">
@@ -130,6 +198,16 @@
 
   <div class="sr-only" aria-live="polite" id="liveRegion"></div>
 
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <p>هل أنت متأكد؟</p>
+      <div class="modal-actions">
+        <button id="cancelBtn" type="button">لا</button>
+        <button id="confirmBtn" type="button" disabled>نعم (٣)</button>
+      </div>
+    </div>
+  </div>
+
   <footer>العدّاد يعمل خلال الجلسة الحالية فقط</footer>
 
 <script>
@@ -138,28 +216,40 @@
   function toEastern(n){ return String(n).replace(/[0-9]/g, d => EAST_DIGITS[d]); }
 
   const ROUND = 33;
+  const MAX_TOTAL = 999999;
   const CIRC = 2 * Math.PI * 46;
 
   let inRound = 0;
   let rounds = 0;
   let total = 0;
+  let unlimited = false;
 
   const countEl = document.getElementById('countDisplay');
+  const countLabelEl = document.getElementById('countLabel');
   const roundsEl = document.getElementById('roundsDisplay');
   const totalEl = document.getElementById('totalDisplay');
   const ringEl = document.getElementById('ringProgress');
   const tapZone = document.getElementById('tapZone');
   const liveRegion = document.getElementById('liveRegion');
   const resetBtn = document.getElementById('resetBtn');
+  const modeBtn = document.getElementById('modeBtn');
 
   ringEl.setAttribute('stroke-dasharray', CIRC.toFixed(2));
 
   function render(){
-    countEl.textContent = toEastern(inRound);
+    if (unlimited){
+      countEl.textContent = toEastern(total);
+      countLabelEl.textContent = 'بدون حد';
+      const progress = total / MAX_TOTAL;
+      ringEl.setAttribute('stroke-dashoffset', (CIRC * (1 - progress)).toFixed(2));
+    } else {
+      countEl.textContent = toEastern(inRound);
+      countLabelEl.textContent = 'من ٣٣';
+      const progress = inRound / ROUND;
+      ringEl.setAttribute('stroke-dashoffset', (CIRC * (1 - progress)).toFixed(2));
+    }
     roundsEl.textContent = toEastern(rounds);
     totalEl.textContent = toEastern(total);
-    const progress = inRound / ROUND;
-    ringEl.setAttribute('stroke-dashoffset', (CIRC * (1 - progress)).toFixed(2));
   }
 
   let liveTimer = null;
@@ -180,14 +270,27 @@
   // كل نقرة تُحسب فورًا داخل معالج الحدث نفسه دون أي تأخير أو انتظار
   // لانتهاء أي حركة، لذلك النقرات المتتالية والسريعة جدًا تُحتسب كلها.
   function tick(clientX, clientY){
+    if (total >= MAX_TOTAL){
+      if (navigator.vibrate) { try { navigator.vibrate([6,30,6,30,6]); } catch(e){} }
+      return;
+    }
     total += 1;
-    inRound += 1;
-    if (inRound >= ROUND){
-      inRound = 0;
-      rounds += 1;
-      if (navigator.vibrate) { try { navigator.vibrate([12, 40, 12]); } catch(e){} }
+    if (unlimited){
+      if (total % ROUND === 0){
+        rounds += 1;
+        if (navigator.vibrate) { try { navigator.vibrate([12, 40, 12]); } catch(e){} }
+      } else {
+        if (navigator.vibrate) { try { navigator.vibrate(9); } catch(e){} }
+      }
     } else {
-      if (navigator.vibrate) { try { navigator.vibrate(9); } catch(e){} }
+      inRound += 1;
+      if (inRound >= ROUND){
+        inRound = 0;
+        rounds += 1;
+        if (navigator.vibrate) { try { navigator.vibrate([12, 40, 12]); } catch(e){} }
+      } else {
+        if (navigator.vibrate) { try { navigator.vibrate(9); } catch(e){} }
+      }
     }
     render();
     announce();
@@ -210,26 +313,55 @@
     }
   });
 
-  let resetArmed = false;
-  let resetTimer = null;
+  modeBtn.addEventListener('click', () => {
+    unlimited = !unlimited;
+    modeBtn.classList.toggle('active', unlimited);
+    document.body.classList.toggle('unlimited-mode', unlimited);
+    modeBtn.textContent = unlimited ? 'وضع بدون حد ✓' : 'بدون حد';
+    inRound = 0;
+    render();
+  });
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const confirmBtn = document.getElementById('confirmBtn');
+  let countdownTimer = null;
+
+  function openModal(){
+    modalOverlay.classList.add('open');
+    let secondsLeft = 3;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'نعم (' + toEastern(secondsLeft) + ')';
+    countdownTimer = setInterval(() => {
+      secondsLeft -= 1;
+      if (secondsLeft <= 0){
+        clearInterval(countdownTimer);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'نعم';
+      } else {
+        confirmBtn.textContent = 'نعم (' + toEastern(secondsLeft) + ')';
+      }
+    }, 1000);
+  }
+
+  function closeModal(){
+    clearInterval(countdownTimer);
+    modalOverlay.classList.remove('open');
+  }
+
   resetBtn.addEventListener('click', () => {
-    if (!resetArmed){
-      resetArmed = true;
-      resetBtn.classList.add('confirm');
-      resetBtn.textContent = 'تأكيد المسح؟';
-      resetTimer = setTimeout(() => {
-        resetArmed = false;
-        resetBtn.classList.remove('confirm');
-        resetBtn.textContent = 'إعادة الضبط';
-      }, 2500);
-      return;
-    }
-    clearTimeout(resetTimer);
-    resetArmed = false;
-    resetBtn.classList.remove('confirm');
-    resetBtn.textContent = 'إعادة الضبط';
+    openModal();
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    closeModal();
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    if (confirmBtn.disabled) return;
     inRound = 0; rounds = 0; total = 0;
     render();
+    closeModal();
   });
 
   render();
