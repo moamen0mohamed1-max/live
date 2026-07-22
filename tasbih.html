@@ -59,6 +59,39 @@
     box-shadow:0 0 16px rgba(79,216,196,.65), 0 0 32px rgba(79,216,196,.5);
   }
 
+  #soundBtn{
+    --neon-violet:#b088ff; --neon-violet-glow: rgba(176,136,255,.65);
+    display:flex; align-items:center; justify-content:center;
+    width:30px; height:30px; padding:0; margin-inline-start:2px;
+    border-radius:50%; cursor:pointer;
+    background:rgba(176,136,255,.06); border:1px solid var(--neon-violet); color:var(--neon-violet);
+    box-shadow:0 0 8px rgba(176,136,255,.35), inset 0 0 8px rgba(176,136,255,.12);
+    transition: transform .15s, box-shadow .2s, color .2s, border-color .2s, background .2s;
+  }
+  #soundBtn svg{ width:15px; height:15px; filter:drop-shadow(0 0 4px var(--neon-violet-glow)); }
+  #soundBtn:active{ transform:scale(.88); }
+  #soundBtn:focus-visible{ outline:2px solid var(--neon-violet); outline-offset:2px; }
+  #soundBtn.muted{
+    color:var(--muted); border-color:rgba(139,144,150,.45);
+    background:rgba(139,144,150,.05); box-shadow:none;
+  }
+  #soundBtn.muted svg{ filter:none; }
+
+  .sound-control{ position:relative; display:flex; align-items:center; }
+  .volume-popup{
+    position:absolute; top:calc(100% + 10px); right:50%; transform:translateX(50%) translateY(-6px);
+    background:#14181c; border:1px solid rgba(176,136,255,.35); border-radius:12px;
+    padding:10px 12px; min-width:120px;
+    box-shadow:0 8px 24px rgba(0,0,0,.45), 0 0 14px rgba(176,136,255,.2);
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:40;
+    display:flex; align-items:center; gap:8px;
+  }
+  .volume-popup.show{ opacity:1; pointer-events:auto; transform:translateX(50%) translateY(0); }
+  .volume-popup input[type="range"]{
+    flex:1; height:3px; accent-color:#b088ff; cursor:pointer;
+  }
+  .volume-popup .vlbl{ font-size:11px; color:var(--muted); min-width:26px; text-align:center; }
+
   #resetBtn{
     background:rgba(255,43,69,.06); border:1px solid var(--neon-red); color:var(--neon-red);
     font-family:'Tajawal',sans-serif; font-size:12px; padding:7px 12px; border-radius:999px; cursor:pointer;
@@ -181,6 +214,23 @@
 <body>
   <header>
     <div class="header-controls">
+      <div class="sound-control">
+        <button id="soundBtn" type="button" aria-label="تشغيل أو إيقاف الصوت" aria-pressed="true">
+          <svg id="soundIconOn" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M4 9v6h4l5 5V4L8 9H4z"/>
+            <path fill="currentColor" d="M16.4 12c0-1.77-.77-3.29-2-4.4v8.8c1.23-1.11 2-2.63 2-4.4z"/>
+            <path fill="currentColor" d="M14.4 5.3v1.7c2.5 1.1 4.2 3.6 4.2 6.5s-1.7 5.4-4.2 6.5v1.7c3.4-1.15 5.8-4.3 5.8-8.2s-2.4-7.05-5.8-8.2z" opacity=".55"/>
+          </svg>
+          <svg id="soundIconOff" viewBox="0 0 24 24" aria-hidden="true" style="display:none">
+            <path fill="currentColor" d="M4 9v6h4l5 5V4L8 9H4z"/>
+            <path fill="currentColor" d="M19.1 12l2.1-2.1-1-1-2.1 2.1-2.1-2.1-1 1 2.1 2.1-2.1 2.1 1 1 2.1-2.1 2.1 2.1 1-1z"/>
+          </svg>
+        </button>
+        <div class="volume-popup" id="volumePopup">
+          <span class="vlbl" id="volumeLbl">٨٥٪</span>
+          <input type="range" id="volumeSlider" min="0" max="100" value="85" step="5" aria-label="مستوى صوت النقر">
+        </div>
+      </div>
       <button id="resetBtn" type="button">إعادة الضبط</button>
       <button id="modeBtn" type="button">بدون حد</button>
     </div>
@@ -255,6 +305,157 @@
   const liveRegion = document.getElementById('liveRegion');
   const resetBtn = document.getElementById('resetBtn');
   const modeBtn = document.getElementById('modeBtn');
+  const soundBtn = document.getElementById('soundBtn');
+  const soundIconOn = document.getElementById('soundIconOn');
+  const soundIconOff = document.getElementById('soundIconOff');
+  const volumePopup = document.getElementById('volumePopup');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const volumeLbl = document.getElementById('volumeLbl');
+
+  // ── الصوت ─────────────────────────────────────────────
+  let audioCtx = null;
+  let masterGain = null;
+  let muted = false;
+  let volume = 0.85;
+  let volumePopupTimer = null;
+
+  function showVolumePopup(){
+    volumePopup.classList.add('show');
+    clearTimeout(volumePopupTimer);
+    volumePopupTimer = setTimeout(() => {
+      volumePopup.classList.remove('show');
+    }, 3000);
+  }
+
+  volumeSlider.addEventListener('input', () => {
+    volume = Number(volumeSlider.value) / 100;
+    volumeLbl.textContent = toEastern(volumeSlider.value) + '٪';
+    showVolumePopup();
+  });
+
+  volumeSlider.addEventListener('pointerdown', () => {
+    ensureAudioCtx();
+    showVolumePopup();
+  });
+
+  function ensureAudioCtx(){
+    if (!audioCtx){
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 1;
+        const comp = audioCtx.createDynamicsCompressor();
+        comp.threshold.value = -18;
+        comp.knee.value = 12;
+        comp.ratio.value = 6;
+        comp.attack.value = 0.002;
+        comp.release.value = 0.15;
+        masterGain.connect(comp).connect(audioCtx.destination);
+      }
+      catch(e){ audioCtx = null; masterGain = null; }
+    }
+    if (audioCtx && audioCtx.state === 'suspended'){
+      audioCtx.resume().catch(() => {});
+    }
+    return audioCtx;
+  }
+
+  let noiseBuffer = null;
+  function getNoiseBuffer(ctx){
+    if (!noiseBuffer){
+      const size = Math.floor(ctx.sampleRate * 0.05);
+      noiseBuffer = ctx.createBuffer(1, size, ctx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < size; i++){
+        // تلاشي سريع عشان تبقى طقة قصيرة مش ضجيج ممتد
+        const decay = 1 - (i / size);
+        data[i] = (Math.random() * 2 - 1) * decay;
+      }
+    }
+    return noiseBuffer;
+  }
+
+  function playTapSound(){
+    if (muted) return;
+    const ctx = ensureAudioCtx();
+    if (!ctx || !masterGain) return;
+    const now = ctx.currentTime;
+    const lvl = 0.6 + volume * 0.7; // صوت أقوى بوضوح حتى عند أقل مستوى
+
+    // جسم النقرة: نغمة خشبية دافئة منخفضة
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 900;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(190, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.045);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.6 * lvl, now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+    osc.connect(filter).connect(gain).connect(masterGain);
+    osc.start(now);
+    osc.stop(now + 0.12);
+
+    // طقّة احتكاك الخشب: نويز قصير جدًا مفلتر يدي واقعية "تك" حبة السبحة
+    const noise = ctx.createBufferSource();
+    noise.buffer = getNoiseBuffer(ctx);
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.value = 1500;
+    noiseFilter.Q.value = 1;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.0001, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.85 * lvl, now + 0.002);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+    noise.connect(noiseFilter).connect(noiseGain).connect(masterGain);
+    noise.start(now);
+    noise.stop(now + 0.025);
+  }
+
+  function playBellTone(ctx, startTime, baseFreq, volume, decay){
+    // جرس رقيق متعدد التوافقيات يحاكي صوت الأجراس الهادئة
+    const partials = [1, 2.4, 3.8];
+    const partialGains = [0.55, 0.25, 0.1];
+    partials.forEach((mult, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq * mult, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(volume * partialGains[idx], startTime + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + decay - idx * 0.15);
+      osc.connect(gain).connect(masterGain || ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + decay + 0.05);
+    });
+  }
+
+  function playCelebrationSound(){
+    if (muted) return;
+    const ctx = ensureAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const lvl = 0.6 + volume * 0.7;
+    // نغمتان هادئتان متتاليتان بطابع روحاني عند إتمام ٣٣
+    playBellTone(ctx, now, 587.33, 0.45 * lvl, 1.1);
+    playBellTone(ctx, now + 0.32, 783.99, 0.34 * lvl, 0.9);
+  }
+
+  function setMuted(next){
+    muted = next;
+    soundBtn.classList.toggle('muted', muted);
+    soundBtn.setAttribute('aria-pressed', String(!muted));
+    soundIconOn.style.display = muted ? 'none' : '';
+    soundIconOff.style.display = muted ? '' : 'none';
+  }
+
+  soundBtn.addEventListener('click', () => {
+    ensureAudioCtx();
+    setMuted(!muted);
+    showVolumePopup();
+  });
 
   ringEl.setAttribute('stroke-dasharray', CIRC.toFixed(2));
 
@@ -301,8 +502,10 @@
       if (total % ROUND === 0){
         rounds += 1;
         if (navigator.vibrate) { try { navigator.vibrate([12, 40, 12]); } catch(e){} }
+        playCelebrationSound();
       } else {
         if (navigator.vibrate) { try { navigator.vibrate(9); } catch(e){} }
+        playTapSound();
       }
     } else {
       inRound += 1;
@@ -310,8 +513,10 @@
         inRound = 0;
         rounds += 1;
         if (navigator.vibrate) { try { navigator.vibrate([12, 40, 12]); } catch(e){} }
+        playCelebrationSound();
       } else {
         if (navigator.vibrate) { try { navigator.vibrate(9); } catch(e){} }
+        playTapSound();
       }
     }
     render();
@@ -391,3 +596,4 @@
 </script>
 </body>
 </html>
+
