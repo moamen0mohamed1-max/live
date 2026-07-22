@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مؤمن | إذاعة القرآن الكريم من القاهرة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-deep:#1a0705;
@@ -16,8 +16,6 @@
     --gold-bright:#f3d576;
     --gold-dim:#8a6a2c;
     --cream:#f4e6c8;
-    --saudi-green:#0f5c3f;
-    --saudi-green-deep:#083c29;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%;}
@@ -32,10 +30,10 @@
       linear-gradient(180deg, var(--bg-deep), #0d0302);
     color:var(--cream);
     font-family:'Cairo', sans-serif;
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
     overflow-x:hidden;
     position:relative;
-    padding:90px 16px 190px;
+    padding:70px 16px 190px;
   }
 
   /* subtle hieroglyph texture drifting across background */
@@ -151,30 +149,20 @@
   }
   footer{ font-size:.72rem; color:#c9a679; opacity:.8; }
 
-  .radios{
-    position:relative; z-index:2;
-    display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
-    width:min(430px, 92vw);
-    margin-top:24px;
+  #telegramBtn{
+    --tg:#2AABEE; --tg-glow: rgba(42,171,238,.65);
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin:18px auto 0; width:max-content;
+    background:rgba(42,171,238,.06); border:1px solid var(--tg); color:var(--tg);
+    font-family:'Cairo', sans-serif; font-size:13px; font-weight:700;
+    padding:9px 20px; border-radius:999px; text-decoration:none;
+    text-shadow:0 0 6px var(--tg-glow), 0 0 14px var(--tg-glow);
+    box-shadow:0 0 10px rgba(42,171,238,.35), inset 0 0 10px rgba(42,171,238,.12);
+    transition: transform .15s, box-shadow .2s;
   }
-  .radio-card{
-    flex:1 1 160px;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 18px;
-    border-radius:14px;
-    text-decoration:none;
-    color:var(--cream);
-    font-family:'Cairo', sans-serif;
-    font-weight:700;
-    font-size:.85rem;
-    box-shadow:0 14px 30px rgba(0,0,0,.4);
-    transition:transform .15s ease;
-  }
-  .radio-card:hover{ transform:translateY(-3px); }
-  .radio-card.haramain{ background:linear-gradient(135deg, var(--gold), var(--gold-dim)); color:#2a1a05; }
-  .radio-card.saudi{ background:linear-gradient(135deg, var(--saudi-green), var(--saudi-green-deep)); }
-  .radio-card .label small{ display:block; font-weight:400; font-size:.68rem; opacity:.8; margin-top:3px; }
-  .radio-card .arrow{ font-size:1.2rem; }
+  #telegramBtn svg{ filter:drop-shadow(0 0 5px var(--tg-glow)); }
+  #telegramBtn:active{ transform:scale(.96); }
+  #telegramBtn:focus-visible{ outline:2px solid var(--tg); outline-offset:2px; }
 
   /* Cairo skyline silhouette fixed at bottom */
   .skyline{
@@ -208,19 +196,15 @@
     <div class="station-name">إذاعة القرآن الكريم – القاهرة</div>
     <div class="freq">93.1 FM · بث إنترنت مباشر</div>
 
+    <a href="https://t.me/K4_X7" target="_blank" rel="noopener noreferrer" id="telegramBtn">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path fill="currentColor" d="M21.94 4.11c.26-1.13-.86-2.03-1.9-1.6L2.4 9.83c-1.03.42-1 1.91.05 2.28l4.36 1.53 1.7 5.4c.28.9 1.42 1.15 2.05.45l2.36-2.6 4.28 3.2c.9.67 2.2.18 2.44-.93L21.94 4.11zM8.53 13.1l9.4-6.02c.3-.2.6.2.34.44l-7.7 7.03a1 1 0 0 0-.3.53l-.26 1.98-.7-2.6a1 1 0 0 1 .22-1.36z"/>
+      </svg>
+      <span>تيليجرام</span>
+    </a>
+
     <div class="divider"></div>
     <footer>مؤمن — رفيقك في رحلة القرآن</footer>
-  </div>
-
-  <div class="radios">
-    <a class="radio-card haramain" href="./mumin-haramain-live.html">
-      <span class="label">البث المباشر للحرمين<small>مكة والمدينة</small></span>
-      <span class="arrow">◄</span>
-    </a>
-    <a class="radio-card saudi" href="./mumin-radio-saudi.html">
-      <span class="label">إذاعة القرآن الكريم — السعودية<small>بث مباشر</small></span>
-      <span class="arrow">◄</span>
-    </a>
   </div>
 
   <div class="skyline">
@@ -314,3 +298,4 @@
 </script>
 </body>
 </html>
+
