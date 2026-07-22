@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مؤمن | إذاعة القرآن الكريم السعودية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;700&family=Tajawal:wght@300;400;500;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#04140d;
@@ -14,8 +14,6 @@
     --gold:#d4b483;
     --gold-soft:#e9d3a8;
     --sand:#f2ead9;
-    --egypt-red:#9c2027;
-    --egypt-red-deep:#5c1114;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -23,10 +21,9 @@
     background:
       radial-gradient(ellipse at 50% 120%, #0b3324 0%, var(--bg) 60%);
     color:var(--sand);
-    font-family:'IBM Plex Sans Arabic', sans-serif;
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:22px;
+    font-family:'Tajawal', sans-serif;
+    display:flex; align-items:center; justify-content:center;
     position:relative; overflow-x:hidden;
-    padding:90px 16px 50px;
   }
   /* Sadu-inspired zigzag border top & bottom */
   .sadu{
@@ -53,10 +50,10 @@
 
   .brand{
     position:fixed; top:26px; right:26px; z-index:5;
-    font-family:'Amiri', serif;
-    font-size:1.35rem; color:var(--gold-soft); letter-spacing:1px;
+    font-family:'Reem Kufi', sans-serif;
+    font-size:1.25rem; color:var(--gold-soft); letter-spacing:1px;
   }
-  .brand span{display:block; font-size:.8rem; opacity:.6; font-family:'IBM Plex Sans Arabic'; margin-top:2px;}
+  .brand span{display:block; font-size:.8rem; opacity:.6; font-family:'Tajawal'; margin-top:2px;}
 
   .panel{
     position:relative; z-index:2;
@@ -69,7 +66,7 @@
     text-align:center;
   }
   .eyebrow{ font-size:.78rem; letter-spacing:3px; color:var(--gold); text-transform:uppercase; }
-  h1{ font-family:'Amiri', serif; font-size:2.15rem; font-weight:700; margin:10px 0 4px; text-shadow:0 2px 12px rgba(212,180,131,.25); }
+  h1{ font-family:'Reem Kufi', sans-serif; font-size:2rem; margin:10px 0 4px; }
   .sub{ color:#bcd; font-size:.9rem; opacity:.75; margin-bottom:26px; }
 
   .dial-wrap{ position:relative; width:200px; height:200px; margin:0 auto 48px; }
@@ -89,7 +86,14 @@
   #playBtn svg{ width:46px; height:46px; fill:var(--gold-soft); }
 
   .bars{ position:absolute; bottom:-34px; left:50%; transform:translateX(-50%); display:flex; gap:4px; align-items:flex-end; height:20px; }
-  .bars i{ width:3px; background:var(--gold); border-radius:2px; height:6px; transition:height .5s ease-in-out; }
+  .bars i{ width:3px; background:var(--gold); border-radius:2px; height:6px; }
+  body.playing .bars i{ animation:bounce 1s ease-in-out infinite; }
+  .bars i:nth-child(1){animation-delay:.0s;}
+  .bars i:nth-child(2){animation-delay:.15s;}
+  .bars i:nth-child(3){animation-delay:.3s;}
+  .bars i:nth-child(4){animation-delay:.45s;}
+  .bars i:nth-child(5){animation-delay:.6s;}
+  @keyframes bounce{0%,100%{height:5px;} 50%{height:20px;}}
 
   .status{ font-size:.95rem; color:var(--gold-soft); min-height:22px; margin-bottom:6px; }
   .station-name{ font-size:1.05rem; font-weight:800; }
@@ -98,28 +102,20 @@
   .divider{ margin:24px 0 18px; height:1px; background:linear-gradient(90deg, transparent, rgba(212,180,131,.5), transparent); }
   footer{ font-size:.72rem; color:#8a9; }
 
-  .radios{
-    position:relative; z-index:2;
-    display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
-    width:min(420px, 90vw);
+  #telegramBtn{
+    --tg:#2AABEE; --tg-glow: rgba(42,171,238,.65);
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin:18px auto 0; width:max-content;
+    background:rgba(42,171,238,.06); border:1px solid var(--tg); color:var(--tg);
+    font-family:'Tajawal', sans-serif; font-size:13px; font-weight:700;
+    padding:9px 20px; border-radius:999px; text-decoration:none;
+    text-shadow:0 0 6px var(--tg-glow), 0 0 14px var(--tg-glow);
+    box-shadow:0 0 10px rgba(42,171,238,.35), inset 0 0 10px rgba(42,171,238,.12);
+    transition: transform .15s, box-shadow .2s;
   }
-  .radio-card{
-    flex:1 1 160px;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 18px;
-    border-radius:14px;
-    text-decoration:none;
-    font-family:'IBM Plex Sans Arabic', sans-serif;
-    font-weight:700;
-    font-size:.85rem;
-    box-shadow:0 14px 30px rgba(0,0,0,.4);
-    transition:transform .15s ease;
-  }
-  .radio-card:hover{ transform:translateY(-3px); }
-  .radio-card.haramain{ background:linear-gradient(135deg, var(--gold), #8a6a2c); color:#1c1206; }
-  .radio-card.egypt{ background:linear-gradient(135deg, var(--egypt-red), var(--egypt-red-deep)); color:var(--sand); }
-  .radio-card .label small{ display:block; font-weight:400; font-size:.68rem; opacity:.8; margin-top:3px; }
-  .radio-card .arrow{ font-size:1.2rem; }
+  #telegramBtn svg{ filter:drop-shadow(0 0 5px var(--tg-glow)); }
+  #telegramBtn:active{ transform:scale(.96); }
+  #telegramBtn:focus-visible{ outline:2px solid var(--tg); outline-offset:2px; }
 </style>
 </head>
 <body>
@@ -147,19 +143,15 @@
     <div class="station-name">إذاعة القرآن الكريم — السعودية</div>
     <div class="freq">بث إنترنت مباشر · جودة عالية</div>
 
+    <a href="https://t.me/K4_X7" target="_blank" rel="noopener noreferrer" id="telegramBtn">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path fill="currentColor" d="M21.94 4.11c.26-1.13-.86-2.03-1.9-1.6L2.4 9.83c-1.03.42-1 1.91.05 2.28l4.36 1.53 1.7 5.4c.28.9 1.42 1.15 2.05.45l2.36-2.6 4.28 3.2c.9.67 2.2.18 2.44-.93L21.94 4.11zM8.53 13.1l9.4-6.02c.3-.2.6.2.34.44l-7.7 7.03a1 1 0 0 0-.3.53l-.26 1.98-.7-2.6a1 1 0 0 1 .22-1.36z"/>
+      </svg>
+      <span>تيليجرام</span>
+    </a>
+
     <div class="divider"></div>
     <footer>مؤمن — رفيقك في رحلة القرآن</footer>
-  </div>
-
-  <div class="radios">
-    <a class="radio-card haramain" href="./mumin-haramain-live.html">
-      <span class="label">البث المباشر للحرمين<small>مكة والمدينة</small></span>
-      <span class="arrow">◄</span>
-    </a>
-    <a class="radio-card egypt" href="./mumin-radio-egypt.html">
-      <span class="label">إذاعة القرآن الكريم — مصر<small>القاهرة · 93.1 FM</small></span>
-      <span class="arrow">◄</span>
-    </a>
   </div>
 
   <audio id="radio" preload="none">
@@ -172,26 +164,7 @@
   const iconPlay = document.getElementById('iconPlay');
   const iconPause = document.getElementById('iconPause');
   const status = document.getElementById('status');
-  const barEls = document.querySelectorAll('.bars i');
   let playing = false;
-  let barsTimer = null;
-
-  function randomizeBars(){
-    barEls.forEach(bar=>{
-      const h = 5 + Math.random() * 20; // بين 5px و 25px
-      bar.style.height = h + 'px';
-    });
-  }
-  function startBars(){
-    if(barsTimer) return;
-    randomizeBars();
-    barsTimer = setInterval(randomizeBars, 650); // سرعة متوسطة وعشوائية
-  }
-  function stopBars(){
-    clearInterval(barsTimer);
-    barsTimer = null;
-    barEls.forEach(bar=> bar.style.height = '6px');
-  }
 
   btn.addEventListener('click', () => {
     if(!playing){
@@ -202,7 +175,6 @@
         iconPlay.style.display='none';
         iconPause.style.display='block';
         status.textContent = 'يُبث الآن مباشرة';
-        startBars();
       }).catch(()=>{
         status.textContent = 'تعذر تشغيل البث، حاول مجددًا';
       });
@@ -213,7 +185,6 @@
       iconPlay.style.display='block';
       iconPause.style.display='none';
       status.textContent = 'تم الإيقاف';
-      stopBars();
     }
   });
 
@@ -223,3 +194,4 @@
 </script>
 </body>
 </html>
+
