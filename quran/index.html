@@ -3,476 +3,482 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>قنديل — إشعارات يقين الصوتية</title>
+<title>مُرتِّل — تتبّع التلاوة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-0:#0a0f1c;
-    --bg-1:#0f1830;
-    --card:#141f3d;
-    --card-line:#26355e;
-    --gold:#c9a15a;
-    --gold-bright:#e8c988;
-    --teal:#2e7d6b;
-    --teal-bright:#49b39a;
-    --ink:#f1ead9;
-    --ink-dim:#9fb0c9;
-    --danger:#c9695a;
-    --radius:16px;
+    --bg-0:#07090a; --bg-1:#0d1210; --panel:#111814; --panel-border:#25301f;
+    --gold:#c9a24b; --gold-soft:#8f7a3f; --ink:#ece4d0; --ink-dim:#8b9184; --error:#9b3b3b;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
   body{
-    min-height:100vh;
-    background:
-      radial-gradient(1100px 600px at 50% -10%, #1a2a52 0%, transparent 60%),
-      linear-gradient(180deg,var(--bg-0),var(--bg-1) 60%,#080c16);
-    color:var(--ink);
-    font-family:'Cairo',sans-serif;
-    padding:28px 16px 80px;
-    position:relative;
-    overflow-x:hidden;
+    margin:0; font-family:'Cormorant Garamond', serif;
+    background: radial-gradient(1200px 600px at 50% -10%, rgba(201,162,75,0.06), transparent 60%), linear-gradient(180deg, var(--bg-0), var(--bg-1));
+    color:var(--ink); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:28px 16px 20px;
   }
-  body::before{
-    content:"";
-    position:fixed; inset:0;
-    background-image:
-      radial-gradient(1px 1px at 20% 30%, rgba(241,234,217,.35) 0, transparent 60%),
-      radial-gradient(1px 1px at 70% 60%, rgba(241,234,217,.25) 0, transparent 60%),
-      radial-gradient(1.5px 1.5px at 40% 80%, rgba(241,234,217,.3) 0, transparent 60%),
-      radial-gradient(1px 1px at 85% 20%, rgba(241,234,217,.3) 0, transparent 60%),
-      radial-gradient(1.5px 1.5px at 55% 10%, rgba(241,234,217,.25) 0, transparent 60%);
-    pointer-events:none;
-    z-index:0;
-  }
-  .wrap{max-width:640px; margin:0 auto; position:relative; z-index:1;}
+  .crest{ display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:18px; }
+  .crest .line{ width:64px; height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .crest h1{ margin:0; font-weight:600; letter-spacing:2px; font-size:15px; color:var(--gold); text-transform:uppercase; }
+  .crest .sub{ font-size:12px; color:var(--ink-dim); letter-spacing:1px; }
+  .shell{ width:100%; max-width:760px; display:flex; flex-direction:column; gap:14px; flex:1; }
 
-  /* ===== القنديل: العنصر المميز ===== */
-  .lantern-zone{display:flex; flex-direction:column; align-items:center; margin-bottom:8px;}
-  .lantern-hook{width:2px; height:22px; background:linear-gradient(var(--gold),transparent);}
-  .lantern{width:92px; height:132px; position:relative; transform-origin:top center; animation:sway 5s ease-in-out infinite;}
-  .lantern.pulse{animation:sway 5s ease-in-out infinite, flash .9s ease-in-out;}
-  @keyframes sway{0%,100%{transform:rotate(-2.5deg);} 50%{transform:rotate(2.5deg);}}
-  @keyframes flash{0%,100%{filter:brightness(1);} 30%{filter:brightness(1.9) saturate(1.3);}}
-  .lantern svg{width:100%; height:100%; display:block;}
-  .glow{
-    position:absolute; top:38%; left:50%; width:150px; height:150px;
-    transform:translate(-50%,-50%);
-    background:radial-gradient(circle, rgba(201,161,90,.45), transparent 65%);
-    filter:blur(6px);
-    z-index:-1;
-    transition:opacity .6s ease, background .6s ease;
-    opacity:.35;
+  .picker{
+    display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;
+    background:rgba(17,24,20,0.6); border:1px solid var(--panel-border); border-radius:4px; padding:10px 14px;
+    font-size:14px; color:var(--ink-dim);
   }
-  .glow.online{opacity:.75;}
-  .glow.pulse{animation:glowpulse .9s ease-in-out;}
-  @keyframes glowpulse{0%,100%{opacity:.75;} 40%{opacity:1; background:radial-gradient(circle, rgba(232,201,136,.75), transparent 65%);}}
+  .picker select{
+    background:#131b16; color:var(--ink); border:1px solid var(--panel-border); border-radius:2px;
+    padding:6px 10px; font-family:'Cormorant Garamond', serif; font-size:15px;
+  }
 
-  h1{
-    font-family:'Amiri',serif; font-weight:700; text-align:center;
-    font-size:30px; margin:6px 0 2px; color:var(--gold-bright);
-    letter-spacing:.5px;
+  .main-area{
+    flex:1; background: linear-gradient(180deg, #121b16, #0d1310); border-radius:4px; padding:44px 38px;
+    min-height:280px; border:1px solid var(--panel-border);
+    box-shadow: 0 0 0 1px rgba(201,162,75,0.05) inset, 0 30px 60px -30px rgba(0,0,0,0.7);
+    font-family:'Scheherazade New', serif; font-size:32px; line-height:2.5; text-align:justify; position:relative;
   }
-  .subtitle{text-align:center; color:var(--ink-dim); font-size:14px; margin:0 0 26px;}
+  .main-area::before, .main-area::after{ content:""; position:absolute; width:18px; height:18px; border:1px solid var(--gold-soft); opacity:.5; }
+  .main-area::before{ top:10px; right:10px; border-left:none; border-bottom:none; }
+  .main-area::after{ bottom:10px; left:10px; border-right:none; border-top:none; }
 
-  .status-row{
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    font-size:13px; color:var(--ink-dim); margin-bottom:26px;
-  }
-  .dot{width:8px; height:8px; border-radius:50%; background:var(--danger); box-shadow:0 0 8px var(--danger);}
-  .dot.online{background:var(--teal-bright); box-shadow:0 0 8px var(--teal-bright);}
+  .word{ transition:color .2s ease, background .2s ease; }
+  .word.revealed-now{ color:var(--gold); }
+  .word.past{ color:#5f6b57; }
+  .word.focus{ background:rgba(201,162,75,0.14); box-shadow: 0 1px 0 var(--gold); border-radius:2px; padding:0 3px; }
+  .ayah-num{ color:var(--gold-soft); font-size:19px; margin:0 8px; }
+  .hint{ color:var(--ink-dim); font-size:17px; text-align:center; }
+  .surah-title{ text-align:center; color:var(--gold); font-size:20px; margin-bottom:14px; letter-spacing:1px; }
 
-  .card{
-    background:linear-gradient(180deg, var(--card), #101a33);
-    border:1px solid var(--card-line);
-    border-radius:var(--radius);
-    padding:20px;
-    margin-bottom:16px;
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-  }
-  .card h2{
-    margin:0 0 4px; font-size:17px; font-family:'Cairo'; font-weight:700; color:var(--gold-bright);
-    display:flex; align-items:center; gap:8px;
-  }
-  .card p.hint{margin:0 0 16px; color:var(--ink-dim); font-size:13px; line-height:1.8;}
+  .toolbar{ display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; padding:12px; background:rgba(17,24,20,0.6); border:1px solid var(--panel-border); border-radius:4px; }
+  .ctl{ display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:2px; border:1px solid var(--panel-border); background:#131b16; color:var(--ink-dim); cursor:pointer; transition:all .2s ease; }
+  .ctl svg{ width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.4; }
+  .ctl:hover{ border-color:var(--gold-soft); color:var(--ink); }
+  .ctl.active{ color:var(--gold); border-color:var(--gold-soft); }
+  .ctl.mic{ width:auto; padding:0 22px; gap:10px; font-size:15px; letter-spacing:1px; }
+  .ctl.mic.on{ color:var(--error); border-color:#4a2222; background:#181110; }
+  .ctl.mic.off{ color:var(--gold); border-color:var(--gold-soft); }
 
-  label{display:block; font-size:13px; color:var(--ink-dim); margin-bottom:6px;}
-  input[type=text], input[type=number]{
-    width:100%; padding:11px 13px; border-radius:10px; border:1px solid var(--card-line);
-    background:#0c1428; color:var(--ink); font-family:'Cairo'; font-size:14px; margin-bottom:14px;
-    outline:none; transition:border-color .2s;
-  }
-  input[type=text]:focus, input[type=number]:focus{border-color:var(--gold);}
+  .live-status{ text-align:center; font-size:11px; letter-spacing:2px; color:var(--ink-dim); text-transform:uppercase; }
+  .status-bar{ display:flex; justify-content:space-between; align-items:center; background:rgba(17,24,20,0.6); border:1px solid var(--panel-border); border-radius:4px; padding:12px 20px; font-size:15px; letter-spacing:.5px; }
+  .status-bar .err-count{ color:var(--gold); }
+  .notice{ border:1px solid #4a3a1a; background:#1a150b; color:#d8b978; border-radius:4px; padding:10px 16px; font-size:13px; text-align:center; }
 
-  .btn{
-    appearance:none; border:none; cursor:pointer; border-radius:10px;
-    font-family:'Cairo'; font-weight:700; font-size:14px; padding:11px 18px;
-    transition:transform .12s ease, filter .2s ease;
-  }
-  .btn:active{transform:scale(.97);}
-  .btn-gold{background:linear-gradient(180deg,var(--gold-bright),var(--gold)); color:#241a08;}
-  .btn-gold:hover{filter:brightness(1.08);}
-  .btn-teal{background:linear-gradient(180deg,var(--teal-bright),var(--teal)); color:#052019;}
-  .btn-ghost{background:transparent; border:1px solid var(--card-line); color:var(--ink);}
-  .btn-danger{background:transparent; border:1px solid var(--danger); color:var(--danger); padding:8px 12px; font-size:12px;}
-  .btn-row{display:flex; gap:10px; flex-wrap:wrap;}
-
-  .sound-item{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding:14px; border:1px solid var(--card-line); border-radius:12px; margin-bottom:10px;
-    background:rgba(255,255,255,.02);
-  }
-  .sound-item:last-child{margin-bottom:0;}
-  .sound-meta{display:flex; align-items:center; gap:12px;}
-  .sound-icon{
-    width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center;
-    background:rgba(201,161,90,.12); font-size:18px; flex-shrink:0;
-  }
-  .sound-title{font-weight:700; font-size:14px;}
-  .sound-file{font-size:12px; color:var(--ink-dim); margin-top:2px;}
-  .sound-actions{display:flex; align-items:center; gap:8px;}
-  .file-btn{
-    display:inline-block; cursor:pointer; font-size:12px; padding:8px 12px; border-radius:8px;
-    border:1px solid var(--card-line); color:var(--ink); background:transparent;
-  }
-  .file-btn:hover{border-color:var(--gold);}
-  input[type=file]{display:none;}
-  .icon-btn{
-    width:34px; height:34px; border-radius:8px; border:1px solid var(--card-line); background:transparent;
-    color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px;
-  }
-  .icon-btn:hover{border-color:var(--teal-bright); color:var(--teal-bright);}
-
-  .log-empty{color:var(--ink-dim); font-size:13px; text-align:center; padding:18px 0;}
-  .log-item{
-    display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px dashed var(--card-line);
-    font-size:13px;
-  }
-  .log-item:last-child{border-bottom:none;}
-  .log-badge{
-    font-size:11px; padding:3px 8px; border-radius:20px; background:rgba(46,125,107,.2); color:var(--teal-bright);
-    white-space:nowrap; flex-shrink:0;
-  }
-  .log-text{color:var(--ink); line-height:1.6;}
-  .log-time{color:var(--ink-dim); font-size:11px;}
-
-  .toast{
-    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
-    background:var(--card); border:1px solid var(--gold); color:var(--ink);
-    padding:12px 20px; border-radius:12px; font-size:14px; font-weight:600;
-    opacity:0; transition:opacity .3s ease, transform .3s ease; z-index:50;
-    box-shadow:0 10px 30px rgba(0,0,0,.4); max-width:90%; text-align:center;
-  }
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
-
-  footer{text-align:center; color:var(--ink-dim); font-size:12px; margin-top:30px; line-height:1.9;}
-  footer b{color:var(--gold-bright);}
+  .overlay{ position:fixed; inset:0; background:rgba(4,6,5,0.86); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal{ max-width:420px; width:100%; background:linear-gradient(180deg, #141d17, #0e1512); border:1px solid var(--panel-border); box-shadow:0 0 0 1px rgba(201,162,75,0.08) inset, 0 40px 80px -20px rgba(0,0,0,0.8); padding:36px 30px 28px; text-align:center; position:relative; }
+  .modal::before{ content:""; position:absolute; top:16px; left:16px; right:16px; bottom:16px; border:1px solid rgba(201,162,75,0.25); pointer-events:none; }
+  .modal .mline{ width:40px; height:1px; background:var(--gold); margin:0 auto 16px; }
+  .modal h2{ margin:0 0 10px; font-weight:600; letter-spacing:1.5px; font-size:20px; color:var(--gold); }
+  .modal p{ color:var(--ink-dim); font-size:15px; line-height:1.9; margin:0 0 22px; }
+  .perm-list{ text-align:right; margin:0 0 26px; display:flex; flex-direction:column; gap:14px; }
+  .perm-item{ display:flex; align-items:flex-start; gap:12px; }
+  .perm-item svg{ width:18px; height:18px; stroke:var(--gold); fill:none; stroke-width:1.4; flex-shrink:0; margin-top:2px; }
+  .perm-item .t{ font-size:15px; color:var(--ink); }
+  .perm-item .d{ font-size:12.5px; color:var(--ink-dim); margin-top:2px; }
+  .modal-btn{ width:100%; padding:14px; background:transparent; color:var(--gold); border:1px solid var(--gold-soft); border-radius:2px; cursor:pointer; font-family:'Cormorant Garamond', serif; font-size:16px; letter-spacing:2px; text-transform:uppercase; transition:all .25s ease; }
+  .modal-btn:hover{ background:var(--gold); color:#0e1512; }
+  .modal-skip{ margin-top:14px; font-size:12px; color:var(--ink-dim); text-decoration:underline; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-
-  <div class="lantern-zone">
-    <div class="lantern-hook"></div>
-    <div class="glow" id="glow"></div>
-    <div class="lantern" id="lantern">
-      <svg viewBox="0 0 92 132" fill="none">
-        <path d="M46 4 L54 16 L38 16 Z" fill="#c9a15a"/>
-        <rect x="34" y="16" width="24" height="6" rx="2" fill="#8a6a34"/>
-        <path d="M28 22 Q46 14 64 22 L60 34 Q46 28 32 34 Z" fill="#c9a15a"/>
-        <rect x="24" y="34" width="44" height="70" rx="10" fill="#101a33" stroke="#c9a15a" stroke-width="2"/>
-        <path d="M46 40 L54 55 L70 55 L57 65 L62 82 L46 71 L30 82 L35 65 L22 55 L38 55 Z" id="lanternStar" fill="#e8c988" opacity="0.9"/>
-        <path d="M28 104 Q46 112 64 104 L60 116 Q46 122 32 116 Z" fill="#c9a15a"/>
-        <circle cx="46" cy="124" r="5" fill="#c9a15a"/>
-      </svg>
+<div class="overlay" id="permOverlay">
+  <div class="modal">
+    <div class="mline"></div>
+    <h2>الإذن بالمتابعة</h2>
+    <p>لبدء تتبّع تلاوتك يحتاج التطبيق الوصول إلى:</p>
+    <div class="perm-list">
+      <div class="perm-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+        <div><div class="t">الميكروفون</div><div class="d">لالتقاط صوت التلاوة والتعرف على الآيات لحظياً</div></div>
+      </div>
+      <div class="perm-item">
+        <svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        <div><div class="t">الاهتزاز</div><div class="d">لتنبيهك بلمسة خفيفة عند تجاوز أو خطأ في كلمة</div></div>
+      </div>
     </div>
+    <button class="modal-btn" id="grantBtn">السماح والمتابعة</button>
+    <div class="modal-skip" id="skipBtn">المتابعة بدون إذن الآن</div>
   </div>
-
-  <h1>قنديل يقين</h1>
-  <p class="subtitle">إشعارات صوتية مخصّصة، متصلة ببوت يقين مباشرةً</p>
-
-  <div class="status-row">
-    <span class="dot" id="statusDot"></span>
-    <span id="statusText">غير متصل بالبوت</span>
-  </div>
-
-  <!-- إعدادات الاتصال -->
-  <div class="card">
-    <h2>🔗 الاتصال بالبوت</h2>
-    <p class="hint">شغّل البوت على جهازك أو سيرفرك (الجسر يعمل تلقائيًا معه على المنفذ 8765)، ثم اكتب هنا عنوانه ورقم آيديك في تليجرام حتى يستقبل التطبيق إشعاراتك أنت فقط.</p>
-    <label>عنوان سيرفر الجسر</label>
-    <input type="text" id="bridgeUrl" placeholder="http://localhost:8765" value="http://localhost:8765">
-    <label>آيدي التليجرام الخاص بك (رقم)</label>
-    <input type="text" id="userId" placeholder="مثال: 8328727852">
-    <div class="btn-row">
-      <button class="btn btn-gold" id="startBtn">بدء الاستماع للإشعارات</button>
-      <button class="btn btn-ghost" id="stopBtn">إيقاف</button>
-    </div>
-  </div>
-
-  <!-- الأصوات المخصصة -->
-  <div class="card">
-    <h2>🎙 الأصوات المخصّصة</h2>
-    <p class="hint">اربط كل نوع إشعار بصوت من عندك. لحظة وصول الإشعار من البوت، يشتغل الصوت المناسب تلقائيًا.</p>
-
-    <div id="soundsList"></div>
-  </div>
-
-  <!-- سجل الإشعارات -->
-  <div class="card">
-    <h2>📜 آخر الإشعارات</h2>
-    <div id="eventLog"><div class="log-empty">لسه مفيش إشعارات وصلت</div></div>
-  </div>
-
-  <footer>
-    <b>ملاحظة</b>: هذا التطبيق يعمل محليًا في متصفحك، ويقرأ الإشعارات من البوت عن طريق سيرفر الجسر (notify_bridge.py) المدمج معه.<br>
-    لو فتحت التطبيق من جهاز تاني (موبايلك مثلًا) بدّل العنوان بعنوان الشبكة المحلية للسيرفر بدل localhost.
-  </footer>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="crest">
+  <div class="line"></div>
+  <h1>مُرتِّل</h1>
+  <div class="sub">تتبّع التلاوة القرآنية — القرآن الكريم كاملاً</div>
+</div>
+
+<div class="shell">
+  <div class="notice" id="engineNotice"></div>
+
+  <div class="picker">
+    <span>ابدأ من:</span>
+    <select id="surahSelect"></select>
+    <select id="ayahSelect"></select>
+    <button class="ctl" id="jumpBtn" style="width:auto;padding:0 16px;">انتقال يدوي</button>
+  </div>
+
+  <div class="main-area">
+    <div class="surah-title" id="surahTitle"></div>
+    <div id="mainArea"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="ctl" id="modeBtn" title="تبديل وضع العرض">
+      <svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+    <button class="ctl active" id="soundBtn" title="صوت الخطأ">
+      <svg viewBox="0 0 24 24"><polygon points="3 9 8 9 13 4 13 20 8 15 3 15 3 9"/><path d="M16 8a5 5 0 0 1 0 8"/></svg>
+    </button>
+    <button class="ctl active" id="vibrateBtn" title="الاهتزاز">
+      <svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+    </button>
+    <button class="ctl" id="resetBtn" title="إعادة البدء">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+    </button>
+    <button class="ctl mic off" id="micBtn" title="بدء/إيقاف الميكروفون">
+      <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+      <span id="micLabel">ابدأ القراءة</span>
+    </button>
+  </div>
+  <div class="live-status" id="liveStatus">بانتظار الإذن</div>
+
+  <div class="status-bar">
+    <span id="stateText">بانتظار بدء القراءة</span>
+    <span>الأخطاء&nbsp; <span class="err-count" id="errorText">٠</span></span>
+  </div>
+</div>
+
+<!-- بيانات القرآن الكريم كاملة (114 سورة) — محوّلة من mainDataQuran.json -->
+<script src="quranData.js"></script>
 
 <script>
-/* ============================ الإعدادات الأساسية ============================ */
-const SOUND_TYPES = [
-  { key:"adhan",    icon:"🕌", title:"الأذان",          desc:"عند دخول وقت الصلاة" },
-  { key:"wird",     icon:"📖", title:"تحدي الورد اليومي", desc:"عند حلول ميعاد ورد يومي" },
-  { key:"azkar",    icon:"🌙", title:"أذكار الصباح/المساء", desc:"عند وقت التحصين اليومي" },
-  { key:"reminder", icon:"🔔", title:"تذكير عام",         desc:"عند أي تذكير مخصص أنشأته" },
-];
+/* =========================================================================
+   إعداد Gemini API
+   ضع مفتاحك الخاص هنا بعد إلغاء أي مفتاح سبق كشفه في محادثات سابقة.
+   تحذير مهم: هذا الملف عند رفعه لأي مكان عام (بما فيه GitHub، حتى لو
+   "خاص" أو تغيّر اسمه لاحقاً) يجعل المفتاح مقروءاً لأي شخص يفتح الصفحة
+   أو يفحص سجل الـ commits. غيّر عنوان الرابط لا يخفي كود الصفحة نفسه.
+   إن اعتُرض المفتاح، ألغه فوراً من Google AI Studio.
+   ========================================================================= */
+const GEMINI_API_KEY = "ضع_مفتاح_Gemini_API_الخاص_بك_هنا";
+const GEMINI_MODEL = "gemini-2.5-flash"; // الأسرع والأخف من عائلة Gemini الحالية
 
-let db = null;
-let soundURLs = {};      // key -> object URL
-let soundNames = {};     // key -> اسم الملف
-let polling = false;
-let pollTimer = null;
-let lastEventId = 0;
-let audioUnlocked = false;
+const QURAN_PROMPT = `أنت محرك تفريغ صوتي متخصص فقط في تفريغ تلاوة القرآن الكريم بالعربية الفصحى.
+انقل الكلمات كما نُطقت حرفياً، بدون أي تعليق أو ترجمة أو تصحيح اجتهادي، وبدون علامات ترقيم.
+أخرج النص فقط، كلمات مفصولة بمسافة واحدة.`;
 
-/* ============================ IndexedDB ============================ */
-function openDB(){
-  return new Promise((resolve,reject)=>{
-    const req = indexedDB.open("yaqen_lantern", 1);
-    req.onupgradeneeded = ()=>{
-      const d = req.result;
-      if(!d.objectStoreNames.contains("sounds")) d.createObjectStore("sounds");
-      if(!d.objectStoreNames.contains("settings")) d.createObjectStore("settings");
-    };
-    req.onsuccess = ()=>resolve(req.result);
-    req.onerror = ()=>reject(req.error);
+const geminiEnabled = GEMINI_API_KEY && !GEMINI_API_KEY.startsWith("ضع_مفتاح");
+
+// ============ 1) تجهيز فهرس مسطّح لكل كلمات القرآن ============
+const FLAT = [];
+const SURAH_INDEX = {}; // surahNumber -> {name, startFlat, ayahs:[{number, words, startFlat}]}
+QURAN_DATA.forEach(surah => {
+  const ayahsMeta = [];
+  surah.verses.forEach(v => {
+    const words = v.t.split(/\s+/).filter(Boolean);
+    const startFlat = FLAT.length;
+    words.forEach((w, wi) => FLAT.push({ surahNumber: surah.n, ayahNumber: v.n, wordIndex: wi, word: w }));
+    ayahsMeta.push({ number: v.n, words, startFlat });
   });
+  SURAH_INDEX[surah.n] = { name: surah.name, ayahs: ayahsMeta };
+});
+
+// ============ 2) التطبيع والمطابقة ============
+function normalizeArabic(str) {
+  return str
+    .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED\u08D3-\u08FF]/g, "")
+    .replace(/\u0640/g, "")
+    .replace(/[إأآاٱ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/ؤ/g, "و")
+    .replace(/ئ/g, "ي")
+    .replace(/\s+/g, " ")
+    .trim();
 }
-function idbGet(store, key){
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,"readonly").objectStore(store).get(key);
-    tx.onsuccess = ()=>resolve(tx.result);
-    tx.onerror = ()=>reject(tx.error);
-  });
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
 }
-function idbSet(store, key, val){
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,"readwrite").objectStore(store).put(val,key);
-    tx.onsuccess = ()=>resolve();
-    tx.onerror = ()=>reject(tx.error);
-  });
+function wordsAreClose(spoken, expected) {
+  const a = normalizeArabic(spoken), b = normalizeArabic(expected);
+  if (!a) return false;
+  if (a === b) return true;
+  return levenshtein(a, b) <= Math.max(1, Math.floor(b.length * 0.3));
 }
-function idbDelete(store, key){
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,"readwrite").objectStore(store).delete(key);
-    tx.onsuccess = ()=>resolve();
-    tx.onerror = ()=>reject(tx.error);
-  });
+const ARABIC_DIGITS = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+function toArabicDigits(n){ return String(n).split("").map(d => ARABIC_DIGITS[+d] ?? d).join(""); }
+
+// ============ 3) الحالة ============
+const state = {
+  mode: "hidden", soundOn: true, vibrationOn: true, micOn: false,
+  started: false, cursor: 0, errorCount: 0, revealed: new Set(), pendingFirstWords: [],
+  currentSurah: null,
+};
+
+function findStartPoint(firstWords) {
+  const target = firstWords.map(normalizeArabic).filter(Boolean);
+  if (target.length < 3) return null;
+  for (let i = 0; i <= FLAT.length - target.length; i++) {
+    let matchCount = 0;
+    for (let j = 0; j < target.length; j++) if (wordsAreClose(target[j], FLAT[i+j].word)) matchCount++;
+    if (matchCount >= target.length - 1) return i;
+  }
+  return null;
+}
+function beginAt(index) {
+  state.started = true; state.cursor = index; state.errorCount = 0;
+  state.currentSurah = FLAT[index].surahNumber;
+  state.revealed = new Set(Array.from({length: index - surahStartFlat(state.currentSurah)}, (_, i) => surahStartFlat(state.currentSurah) + i));
+  render();
+}
+function surahStartFlat(surahNumber) { return SURAH_INDEX[surahNumber].ayahs[0].startFlat; }
+function surahEndFlat(surahNumber) {
+  const ayahs = SURAH_INDEX[surahNumber].ayahs;
+  const last = ayahs[ayahs.length - 1];
+  return last.startFlat + last.words.length;
+}
+function submitWord(spokenWord) {
+  if (!state.started || state.cursor >= surahEndFlat(state.currentSurah)) return;
+  const expected = FLAT[state.cursor];
+  const ok = wordsAreClose(spokenWord, expected.word);
+  state.revealed.add(state.cursor);
+  if (!ok) { state.errorCount++; playErrorSound(); triggerVibration(); }
+  state.cursor++;
+  render();
+}
+function handleIncomingWord(word) {
+  if (!state.started) {
+    state.pendingFirstWords.push(word);
+    const startIndex = findStartPoint(state.pendingFirstWords);
+    if (startIndex !== null) { beginAt(startIndex); state.pendingFirstWords = []; }
+    return;
+  }
+  submitWord(word);
+}
+function resetAll() {
+  state.started = false; state.cursor = 0; state.errorCount = 0;
+  state.revealed = new Set(); state.pendingFirstWords = []; state.currentSurah = null;
+  render();
 }
 
-/* ============================ واجهة الأصوات ============================ */
-function renderSoundsList(){
-  const list = document.getElementById("soundsList");
-  list.innerHTML = "";
-  SOUND_TYPES.forEach(t=>{
-    const hasSound = !!soundURLs[t.key];
-    const item = document.createElement("div");
-    item.className = "sound-item";
-    item.innerHTML = `
-      <div class="sound-meta">
-        <div class="sound-icon">${t.icon}</div>
-        <div>
-          <div class="sound-title">${t.title}</div>
-          <div class="sound-file">${hasSound ? "🎵 " + soundNames[t.key] : "بدون صوت مخصص — " + t.desc}</div>
-        </div>
-      </div>
-      <div class="sound-actions">
-        ${hasSound ? `<button class="icon-btn" data-play="${t.key}" title="تجربة">▶</button>` : ""}
-        <label class="file-btn">${hasSound ? "تغيير" : "رفع صوت"}
-          <input type="file" accept="audio/*" data-upload="${t.key}">
-        </label>
-        ${hasSound ? `<button class="icon-btn" data-remove="${t.key}" title="حذف">✕</button>` : ""}
-      </div>
-    `;
-    list.appendChild(item);
-  });
-
-  list.querySelectorAll("[data-upload]").forEach(inp=>{
-    inp.addEventListener("change", async (e)=>{
-      const file = e.target.files[0];
-      if(!file) return;
-      const key = inp.dataset.upload;
-      await idbSet("sounds", key, file);
-      await idbSet("settings", "name_"+key, file.name);
-      loadSoundIntoMemory(key, file, file.name);
-      renderSoundsList();
-      showToast("تم حفظ صوت \"" + SOUND_TYPES.find(x=>x.key===key).title + "\"");
-    });
-  });
-  list.querySelectorAll("[data-play]").forEach(btn=>{
-    btn.addEventListener("click", ()=> playSound(btn.dataset.play));
-  });
-  list.querySelectorAll("[data-remove]").forEach(btn=>{
-    btn.addEventListener("click", async ()=>{
-      const key = btn.dataset.remove;
-      await idbDelete("sounds", key);
-      await idbDelete("settings", "name_"+key);
-      delete soundURLs[key];
-      delete soundNames[key];
-      renderSoundsList();
-    });
-  });
+function playErrorSound() {
+  if (!state.soundOn) return;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator(); const gain = ctx.createGain();
+  osc.frequency.value = 300; osc.type = "sine";
+  gain.gain.setValueAtTime(0.001, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(); osc.stop(ctx.currentTime + 0.25);
 }
+function triggerVibration() { if (state.vibrationOn && navigator.vibrate) navigator.vibrate(180); }
 
-function loadSoundIntoMemory(key, blob, name){
-  if(soundURLs[key]) URL.revokeObjectURL(soundURLs[key]);
-  soundURLs[key] = URL.createObjectURL(blob);
-  soundNames[key] = name;
-}
+// ============ 4) العرض ============
+function render() {
+  const mainArea = document.getElementById("mainArea");
+  const titleEl = document.getElementById("surahTitle");
+  mainArea.innerHTML = "";
 
-function playSound(key){
-  const url = soundURLs[key];
-  if(!url) return;
-  const audio = new Audio(url);
-  audio.play().catch(()=>{
-    showToast("افتح \"بدء الاستماع\" مرة الأول عشان المتصفح يسمح بتشغيل الصوت تلقائيًا");
-  });
-  pulseLantern();
-}
+  if (!state.started) {
+    titleEl.textContent = "";
+    mainArea.innerHTML = '<p class="hint">ابدأ القراءة… سيتم تحديد السورة والآية تلقائياً بعد أول كلمات، أو اختر نقطة البداية يدوياً من الأعلى.</p>';
+    return;
+  }
 
-/* ============================ القنديل والتوست ============================ */
-function pulseLantern(){
-  const lantern = document.getElementById("lantern");
-  const glow = document.getElementById("glow");
-  lantern.classList.remove("pulse"); void lantern.offsetWidth; lantern.classList.add("pulse");
-  glow.classList.remove("pulse"); void glow.offsetWidth; glow.classList.add("pulse");
-}
-function showToast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(showToast._timer);
-  showToast._timer = setTimeout(()=>t.classList.remove("show"), 3200);
-}
+  const surahMeta = SURAH_INDEX[state.currentSurah];
+  titleEl.textContent = "سورة " + surahMeta.name;
 
-/* ============================ حالة الاتصال ============================ */
-function setStatus(online){
-  document.getElementById("statusDot").classList.toggle("online", online);
-  document.getElementById("statusText").textContent = online ? "متصل بالبوت ويستمع للإشعارات" : "غير متصل بالبوت";
-  document.getElementById("glow").classList.toggle("online", online);
-}
-
-/* ============================ سجل الإشعارات ============================ */
-const TYPE_LABELS = { adhan:"أذان", wird:"ورد", azkar:"أذكار", reminder:"تذكير" };
-function addLogEntry(evt){
-  const log = document.getElementById("eventLog");
-  const empty = log.querySelector(".log-empty");
-  if(empty) empty.remove();
-  const row = document.createElement("div");
-  row.className = "log-item";
-  const time = new Date(evt.ts*1000).toLocaleTimeString("ar-EG", {hour:"2-digit", minute:"2-digit"});
-  row.innerHTML = `
-    <span class="log-badge">${TYPE_LABELS[evt.type] || evt.type}</span>
-    <div>
-      <div class="log-text">${(evt.title || evt.text || "").toString()}</div>
-      <div class="log-time">${time}</div>
-    </div>
-  `;
-  log.prepend(row);
-  while(log.children.length > 12) log.removeChild(log.lastChild);
-}
-
-/* ============================ الاستماع للجسر (polling) ============================ */
-async function pollOnce(){
-  const base = document.getElementById("bridgeUrl").value.trim().replace(/\/+$/,"");
-  const userId = document.getElementById("userId").value.trim();
-  if(!base || !userId) return;
-  try{
-    const res = await fetch(`${base}/events?user_id=${encodeURIComponent(userId)}&after=${lastEventId}`);
-    const data = await res.json();
-    setStatus(true);
-    if(data.ok){
-      lastEventId = data.last_id || lastEventId;
-      (data.events || []).forEach(evt=>{
-        addLogEntry(evt);
-        pulseLantern();
-        playSound(evt.type);
-        showToast(evt.title || TYPE_LABELS[evt.type] || "إشعار جديد");
-        if(window.Notification && Notification.permission === "granted"){
-          new Notification("قنديل يقين", { body: evt.title || evt.text || "" });
-        }
+  if (state.mode === "hidden") {
+    surahMeta.ayahs.forEach(ayah => {
+      ayah.words.forEach((w, wi) => {
+        const flatIndex = ayah.startFlat + wi;
+        if (!state.revealed.has(flatIndex)) return;
+        const span = document.createElement("span");
+        span.className = "word" + (flatIndex === state.cursor - 1 ? " revealed-now" : "");
+        span.textContent = w + " ";
+        mainArea.appendChild(span);
       });
-    }
-  }catch(e){
-    setStatus(false);
+    });
+  } else {
+    surahMeta.ayahs.forEach(ayah => {
+      const p = document.createElement("p");
+      p.style.margin = "0 0 10px";
+      ayah.words.forEach((w, wi) => {
+        const flatIndex = ayah.startFlat + wi;
+        const span = document.createElement("span");
+        let cls = "word";
+        if (flatIndex === state.cursor) cls += " focus";
+        if (flatIndex < state.cursor) cls += " past";
+        span.className = cls;
+        span.textContent = w + " ";
+        p.appendChild(span);
+      });
+      const numSpan = document.createElement("span");
+      numSpan.className = "ayah-num";
+      numSpan.textContent = "﴿" + toArabicDigits(ayah.number) + "﴾";
+      p.appendChild(numSpan);
+      mainArea.appendChild(p);
+    });
+  }
+
+  document.getElementById("stateText").textContent = "جارٍ التتبع";
+  document.getElementById("errorText").textContent = toArabicDigits(state.errorCount);
+  document.getElementById("soundBtn").classList.toggle("active", state.soundOn);
+  document.getElementById("vibrateBtn").classList.toggle("active", state.vibrationOn);
+}
+
+// ============ 5) قائمة اختيار السورة/الآية (للانتقال اليدوي) ============
+const surahSelect = document.getElementById("surahSelect");
+const ayahSelect = document.getElementById("ayahSelect");
+QURAN_DATA.forEach(surah => {
+  const opt = document.createElement("option");
+  opt.value = surah.n;
+  opt.textContent = toArabicDigits(surah.n) + " - " + surah.name;
+  surahSelect.appendChild(opt);
+});
+function fillAyahSelect(surahNumber) {
+  ayahSelect.innerHTML = "";
+  SURAH_INDEX[surahNumber].ayahs.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.number;
+    opt.textContent = "آية " + toArabicDigits(a.number);
+    ayahSelect.appendChild(opt);
+  });
+}
+fillAyahSelect(1);
+surahSelect.onchange = () => fillAyahSelect(+surahSelect.value);
+document.getElementById("jumpBtn").onclick = () => {
+  const sNum = +surahSelect.value, aNum = +ayahSelect.value;
+  const ayah = SURAH_INDEX[sNum].ayahs.find(a => a.number === aNum);
+  beginAt(ayah.startFlat);
+};
+
+// ============ 6) محرك التعرف الصوتي: Gemini (إن وُجد مفتاح) أو المتصفح ============
+const notice = document.getElementById("engineNotice");
+notice.textContent = geminiEnabled
+  ? "محرك التعرف: Gemini (" + GEMINI_MODEL + ")"
+  : "محرك التعرف: التعرف الصوتي المدمج بالمتصفح (لا يوجد مفتاح Gemini مُفعّل)";
+
+let mediaRecorder = null, mediaStream = null, chunkTimer = null;
+async function startGeminiRecognition() {
+  mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const recordChunk = () => {
+    if (!state.micOn) return;
+    const chunks = [];
+    mediaRecorder = new MediaRecorder(mediaStream, { mimeType: "audio/webm;codecs=opus" });
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(chunks, { type: "audio/webm" });
+      const base64 = await blobToBase64(blob);
+      sendChunkToGemini(base64);
+      if (state.micOn) recordChunk();
+    };
+    mediaRecorder.start();
+    setTimeout(() => { if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop(); }, 3000);
+  };
+  recordChunk();
+}
+function stopGeminiRecognition() {
+  if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+}
+function blobToBase64(blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(",")[1]);
+    reader.readAsDataURL(blob);
+  });
+}
+async function sendChunkToGemini(base64Audio) {
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: QURAN_PROMPT }] },
+          contents: [{ parts: [{ inlineData: { mimeType: "audio/webm", data: base64Audio } }] }],
+        }),
+      }
+    );
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (text) text.trim().split(/\s+/).filter(Boolean).forEach(handleIncomingWord);
+  } catch (err) {
+    document.getElementById("liveStatus").textContent = "خطأ اتصال بـ Gemini";
   }
 }
 
-function startListening(){
-  if(polling) return;
-  audioUnlocked = true;
-  // نفتح ونغلق صوت صامت لفتح إذن التشغيل التلقائي في المتصفح
-  const unlock = new Audio();
-  unlock.play().catch(()=>{});
-  if(window.Notification && Notification.permission === "default"){
-    Notification.requestPermission();
+// محرك المتصفح الاحتياطي (مجاني، بدون مفتاح)
+let recognition = null;
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognitionAPI) {
+  recognition = new SpeechRecognitionAPI();
+  recognition.lang = "ar-SA";
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (event) => {
+    const result = event.results[event.results.length - 1];
+    if (result.isFinal) result[0].transcript.trim().split(/\s+/).filter(Boolean).forEach(handleIncomingWord);
+  };
+  recognition.onerror = () => { document.getElementById("liveStatus").textContent = "خطأ في الاتصال"; };
+  recognition.onend = () => { if (state.micOn && !geminiEnabled) recognition.start(); };
+}
+
+// ============ 7) الأزرار ============
+document.getElementById("modeBtn").onclick = () => { state.mode = state.mode === "hidden" ? "visible" : "hidden"; render(); };
+document.getElementById("soundBtn").onclick = () => { state.soundOn = !state.soundOn; render(); };
+document.getElementById("vibrateBtn").onclick = () => { state.vibrationOn = !state.vibrationOn; render(); };
+document.getElementById("resetBtn").onclick = resetAll;
+
+document.getElementById("micBtn").onclick = async () => {
+  const btn = document.getElementById("micBtn");
+  const label = document.getElementById("micLabel");
+  state.micOn = !state.micOn;
+  if (state.micOn) {
+    btn.classList.add("on"); btn.classList.remove("off");
+    label.textContent = "إيقاف";
+    document.getElementById("liveStatus").textContent = "الاستماع";
+    if (geminiEnabled) await startGeminiRecognition();
+    else if (recognition) recognition.start();
+    else document.getElementById("liveStatus").textContent = "لا يوجد محرك تعرف صوتي متاح";
+  } else {
+    btn.classList.remove("on"); btn.classList.add("off");
+    label.textContent = "ابدأ القراءة";
+    document.getElementById("liveStatus").textContent = "متوقف";
+    if (geminiEnabled) stopGeminiRecognition();
+    else if (recognition) recognition.stop();
   }
-  polling = true;
-  setStatus(false);
-  pollOnce();
-  pollTimer = setInterval(pollOnce, 5000);
-  showToast("بدأ الاستماع لإشعارات البوت");
-}
-function stopListening(){
-  polling = false;
-  clearInterval(pollTimer);
-  setStatus(false);
-  showToast("تم إيقاف الاستماع");
-}
+};
 
-/* ============================ التهيئة ============================ */
-async function init(){
-  db = await openDB();
+// ============ 8) نافذة الأذونات ============
+const overlay = document.getElementById("permOverlay");
+function closeOverlay() { overlay.style.display = "none"; document.getElementById("liveStatus").textContent = "جاهز"; }
+document.getElementById("grantBtn").onclick = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(t => t.stop());
+    if (navigator.vibrate) navigator.vibrate(1);
+  } catch (err) {
+    document.getElementById("liveStatus").textContent = "تم رفض إذن الميكروفون";
+  } finally { closeOverlay(); }
+};
+document.getElementById("skipBtn").onclick = closeOverlay;
 
-  // تحميل الأصوات المحفوظة سابقًا
-  for(const t of SOUND_TYPES){
-    const blob = await idbGet("sounds", t.key);
-    if(blob){
-      const name = (await idbGet("settings", "name_"+t.key)) || "صوت مخصص";
-      loadSoundIntoMemory(t.key, blob, name);
-    }
-  }
-  renderSoundsList();
-
-  // استعادة الإعدادات المحفوظة
-  const savedUrl = await idbGet("settings", "bridgeUrl");
-  const savedUser = await idbGet("settings", "userId");
-  if(savedUrl) document.getElementById("bridgeUrl").value = savedUrl;
-  if(savedUser) document.getElementById("userId").value = savedUser;
-
-  document.getElementById("bridgeUrl").addEventListener("change", e=> idbSet("settings","bridgeUrl", e.target.value.trim()));
-  document.getElementById("userId").addEventListener("change", e=> idbSet("settings","userId", e.target.value.trim()));
-
-  document.getElementById("startBtn").addEventListener("click", startListening);
-  document.getElementById("stopBtn").addEventListener("click", stopListening);
-}
-init();
+render();
 </script>
 </body>
 </html>
+
