@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قنديل — إشعارات يقين الصوتية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0f1c;
+    --bg-1:#0f1830;
+    --card:#141f3d;
+    --card-line:#26355e;
+    --gold:#c9a15a;
+    --gold-bright:#e8c988;
+    --teal:#2e7d6b;
+    --teal-bright:#49b39a;
+    --ink:#f1ead9;
+    --ink-dim:#9fb0c9;
+    --danger:#c9695a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1100px 600px at 50% -10%, #1a2a52 0%, transparent 60%),
+      linear-gradient(180deg,var(--bg-0),var(--bg-1) 60%,#080c16);
+    color:var(--ink);
+    font-family:'Cairo',sans-serif;
+    padding:28px 16px 80px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(241,234,217,.35) 0, transparent 60%),
+      radial-gradient(1px 1px at 70% 60%, rgba(241,234,217,.25) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 40% 80%, rgba(241,234,217,.3) 0, transparent 60%),
+      radial-gradient(1px 1px at 85% 20%, rgba(241,234,217,.3) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 55% 10%, rgba(241,234,217,.25) 0, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .wrap{max-width:640px; margin:0 auto; position:relative; z-index:1;}
+
+  /* ===== القنديل: العنصر المميز ===== */
+  .lantern-zone{display:flex; flex-direction:column; align-items:center; margin-bottom:8px;}
+  .lantern-hook{width:2px; height:22px; background:linear-gradient(var(--gold),transparent);}
+  .lantern{width:92px; height:132px; position:relative; transform-origin:top center; animation:sway 5s ease-in-out infinite;}
+  .lantern.pulse{animation:sway 5s ease-in-out infinite, flash .9s ease-in-out;}
+  @keyframes sway{0%,100%{transform:rotate(-2.5deg);} 50%{transform:rotate(2.5deg);}}
+  @keyframes flash{0%,100%{filter:brightness(1);} 30%{filter:brightness(1.9) saturate(1.3);}}
+  .lantern svg{width:100%; height:100%; display:block;}
+  .glow{
+    position:absolute; top:38%; left:50%; width:150px; height:150px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(201,161,90,.45), transparent 65%);
+    filter:blur(6px);
+    z-index:-1;
+    transition:opacity .6s ease, background .6s ease;
+    opacity:.35;
+  }
+  .glow.online{opacity:.75;}
+  .glow.pulse{animation:glowpulse .9s ease-in-out;}
+  @keyframes glowpulse{0%,100%{opacity:.75;} 40%{opacity:1; background:radial-gradient(circle, rgba(232,201,136,.75), transparent 65%);}}
+
+  h1{
+    font-family:'Amiri',serif; font-weight:700; text-align:center;
+    font-size:30px; margin:6px 0 2px; color:var(--gold-bright);
+    letter-spacing:.5px;
+  }
+  .subtitle{text-align:center; color:var(--ink-dim); font-size:14px; margin:0 0 26px;}
+
+  .status-row{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-size:13px; color:var(--ink-dim); margin-bottom:26px;
+  }
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--danger); box-shadow:0 0 8px var(--danger);}
+  .dot.online{background:var(--teal-bright); box-shadow:0 0 8px var(--teal-bright);}
+
+  .card{
+    background:linear-gradient(180deg, var(--card), #101a33);
+    border:1px solid var(--card-line);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  .card h2{
+    margin:0 0 4px; font-size:17px; font-family:'Cairo'; font-weight:700; color:var(--gold-bright);
+    display:flex; align-items:center; gap:8px;
+  }
+  .card p.hint{margin:0 0 16px; color:var(--ink-dim); font-size:13px; line-height:1.8;}
+
+  label{display:block; font-size:13px; color:var(--ink-dim); margin-bottom:6px;}
+  input[type=text], input[type=number]{
+    width:100%; padding:11px 13px; border-radius:10px; border:1px solid var(--card-line);
+    background:#0c1428; color:var(--ink); font-family:'Cairo'; font-size:14px; margin-bottom:14px;
+    outline:none; transition:border-color .2s;
+  }
+  input[type=text]:focus, input[type=number]:focus{border-color:var(--gold);}
+
+  .btn{
+    appearance:none; border:none; cursor:pointer; border-radius:10px;
+    font-family:'Cairo'; font-weight:700; font-size:14px; padding:11px 18px;
+    transition:transform .12s ease, filter .2s ease;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-gold{background:linear-gradient(180deg,var(--gold-bright),var(--gold)); color:#241a08;}
+  .btn-gold:hover{filter:brightness(1.08);}
+  .btn-teal{background:linear-gradient(180deg,var(--teal-bright),var(--teal)); color:#052019;}
+  .btn-ghost{background:transparent; border:1px solid var(--card-line); color:var(--ink);}
+  .btn-danger{background:transparent; border:1px solid var(--danger); color:var(--danger); padding:8px 12px; font-size:12px;}
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap;}
+
+  .sound-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:14px; border:1px solid var(--card-line); border-radius:12px; margin-bottom:10px;
+    background:rgba(255,255,255,.02);
+  }
+  .sound-item:last-child{margin-bottom:0;}
+  .sound-meta{display:flex; align-items:center; gap:12px;}
+  .sound-icon{
+    width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    background:rgba(201,161,90,.12); font-size:18px; flex-shrink:0;
+  }
+  .sound-title{font-weight:700; font-size:14px;}
+  .sound-file{font-size:12px; color:var(--ink-dim); margin-top:2px;}
+  .sound-actions{display:flex; align-items:center; gap:8px;}
+  .file-btn{
+    display:inline-block; cursor:pointer; font-size:12px; padding:8px 12px; border-radius:8px;
+    border:1px solid var(--card-line); color:var(--ink); background:transparent;
+  }
+  .file-btn:hover{border-color:var(--gold);}
+  input[type=file]{display:none;}
+  .icon-btn{
+    width:34px; height:34px; border-radius:8px; border:1px solid var(--card-line); background:transparent;
+    color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px;
+  }
+  .icon-btn:hover{border-color:var(--teal-bright); color:var(--teal-bright);}
+
+  .log-empty{color:var(--ink-dim); font-size:13px; text-align:center; padding:18px 0;}
+  .log-item{
+    display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px dashed var(--card-line);
+    font-size:13px;
+  }
+  .log-item:last-child{border-bottom:none;}
+  .log-badge{
+    font-size:11px; padding:3px 8px; border-radius:20px; background:rgba(46,125,107,.2); color:var(--teal-bright);
+    white-space:nowrap; flex-shrink:0;
+  }
+  .log-text{color:var(--ink); line-height:1.6;}
+  .log-time{color:var(--ink-dim); font-size:11px;}
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--card); border:1px solid var(--gold); color:var(--ink);
+    padding:12px 20px; border-radius:12px; font-size:14px; font-weight:600;
+    opacity:0; transition:opacity .3s ease, transform .3s ease; z-index:50;
+    box-shadow:0 10px 30px rgba(0,0,0,.4); max-width:90%; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  footer{text-align:center; color:var(--ink-dim); font-size:12px; margin-top:30px; line-height:1.9;}
+  footer b{color:var(--gold-bright);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="lantern-zone">
+    <div class="lantern-hook"></div>
+    <div class="glow" id="glow"></div>
+    <div class="lantern" id="lantern">
+      <svg viewBox="0 0 92 132" fill="none">
+        <path d="M46 4 L54 16 L38 16 Z" fill="#c9a15a"/>
+        <rect x="34" y="16" width="24" height="6" rx="2" fill="#8a6a34"/>
+        <path d="M28 22 Q46 14 64 22 L60 34 Q46 28 32 34 Z" fill="#c9a15a"/>
+        <rect x="24" y="34" width="44" height="70" rx="10" fill="#101a33" stroke="#c9a15a" stroke-width="2"/>
+        <path d="M46 40 L54 55 L70 55 L57 65 L62 82 L46 71 L30 82 L35 65 L22 55 L38 55 Z" id="lanternStar" fill="#e8c988" opacity="0.9"/>
+        <path d="M28 104 Q46 112 64 104 L60 116 Q46 122 32 116 Z" fill="#c9a15a"/>
+        <circle cx="46" cy="124" r="5" fill="#c9a15a"/>
+      </svg>
+    </div>
+  </div>
+
+  <h1>قنديل يقين</h1>
+  <p class="subtitle">إشعارات صوتية مخصّصة، متصلة ببوت يقين مباشرةً</p>
+
+  <div class="status-row">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">غير متصل بالبوت</span>
+  </div>
+
+  <!-- إعدادات الاتصال -->
+  <div class="card">
+    <h2>🔗 الاتصال بالبوت</h2>
+    <p class="hint">شغّل البوت على جهازك أو سيرفرك (الجسر يعمل تلقائيًا معه على المنفذ 8765)، ثم اكتب هنا عنوانه ورقم آيديك في تليجرام حتى يستقبل التطبيق إشعاراتك أنت فقط.</p>
+    <label>عنوان سيرفر الجسر</label>
+    <input type="text" id="bridgeUrl" placeholder="http://localhost:8765" value="http://localhost:8765">
+    <label>آيدي التليجرام الخاص بك (رقم)</label>
+    <input type="text" id="userId" placeholder="مثال: 8328727852">
+    <div class="btn-row">
+      <button class="btn btn-gold" id="startBtn">بدء الاستماع للإشعارات</button>
+      <button class="btn btn-ghost" id="stopBtn">إيقاف</button>
+    </div>
+  </div>
+
+  <!-- الأصوات المخصصة -->
+  <div class="card">
+    <h2>🎙 الأصوات المخصّصة</h2>
+    <p class="hint">اربط كل نوع إشعار بصوت من عندك. لحظة وصول الإشعار من البوت، يشتغل الصوت المناسب تلقائيًا.</p>
+
+    <div id="soundsList"></div>
+  </div>
+
+  <!-- سجل الإشعارات -->
+  <div class="card">
+    <h2>📜 آخر الإشعارات</h2>
+    <div id="eventLog"><div class="log-empty">لسه مفيش إشعارات وصلت</div></div>
+  </div>
+
+  <footer>
+    <b>ملاحظة</b>: هذا التطبيق يعمل محليًا في متصفحك، ويقرأ الإشعارات من البوت عن طريق سيرفر الجسر (notify_bridge.py) المدمج معه.<br>
+    لو فتحت التطبيق من جهاز تاني (موبايلك مثلًا) بدّل العنوان بعنوان الشبكة المحلية للسيرفر بدل localhost.
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================ الإعدادات الأساسية ============================ */
+const SOUND_TYPES = [
+  { key:"adhan",    icon:"🕌", title:"الأذان",          desc:"عند دخول وقت الصلاة" },
+  { key:"wird",     icon:"📖", title:"تحدي الورد اليومي", desc:"عند حلول ميعاد ورد يومي" },
+  { key:"azkar",    icon:"🌙", title:"أذكار الصباح/المساء", desc:"عند وقت التحصين اليومي" },
+  { key:"reminder", icon:"🔔", title:"تذكير عام",         desc:"عند أي تذكير مخصص أنشأته" },
+];
+
+let db = null;
+let soundURLs = {};      // key -> object URL
+let soundNames = {};     // key -> اسم الملف
+let polling = false;
+let pollTimer = null;
+let lastEventId = 0;
+let audioUnlocked = false;
+
+/* ============================ IndexedDB ============================ */
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req = indexedDB.open("yaqen_lantern", 1);
+    req.onupgradeneeded = ()=>{
+      const d = req.result;
+      if(!d.objectStoreNames.contains("sounds")) d.createObjectStore("sounds");
+      if(!d.objectStoreNames.contains("settings")) d.createObjectStore("settings");
+    };
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+  });
+}
+function idbGet(store, key){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(store,"readonly").objectStore(store).get(key);
+    tx.onsuccess = ()=>resolve(tx.result);
+    tx.onerror = ()=>reject(tx.error);
+  });
+}
+function idbSet(store, key, val){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(store,"readwrite").objectStore(store).put(val,key);
+    tx.onsuccess = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  });
+}
+function idbDelete(store, key){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(store,"readwrite").objectStore(store).delete(key);
+    tx.onsuccess = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  });
+}
+
+/* ============================ واجهة الأصوات ============================ */
+function renderSoundsList(){
+  const list = document.getElementById("soundsList");
+  list.innerHTML = "";
+  SOUND_TYPES.forEach(t=>{
+    const hasSound = !!soundURLs[t.key];
+    const item = document.createElement("div");
+    item.className = "sound-item";
+    item.innerHTML = `
+      <div class="sound-meta">
+        <div class="sound-icon">${t.icon}</div>
+        <div>
+          <div class="sound-title">${t.title}</div>
+          <div class="sound-file">${hasSound ? "🎵 " + soundNames[t.key] : "بدون صوت مخصص — " + t.desc}</div>
+        </div>
+      </div>
+      <div class="sound-actions">
+        ${hasSound ? `<button class="icon-btn" data-play="${t.key}" title="تجربة">▶</button>` : ""}
+        <label class="file-btn">${hasSound ? "تغيير" : "رفع صوت"}
+          <input type="file" accept="audio/*" data-upload="${t.key}">
+        </label>
+        ${hasSound ? `<button class="icon-btn" data-remove="${t.key}" title="حذف">✕</button>` : ""}
+      </div>
+    `;
+    list.appendChild(item);
+  });
+
+  list.querySelectorAll("[data-upload]").forEach(inp=>{
+    inp.addEventListener("change", async (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const key = inp.dataset.upload;
+      await idbSet("sounds", key, file);
+      await idbSet("settings", "name_"+key, file.name);
+      loadSoundIntoMemory(key, file, file.name);
+      renderSoundsList();
+      showToast("تم حفظ صوت \"" + SOUND_TYPES.find(x=>x.key===key).title + "\"");
+    });
+  });
+  list.querySelectorAll("[data-play]").forEach(btn=>{
+    btn.addEventListener("click", ()=> playSound(btn.dataset.play));
+  });
+  list.querySelectorAll("[data-remove]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const key = btn.dataset.remove;
+      await idbDelete("sounds", key);
+      await idbDelete("settings", "name_"+key);
+      delete soundURLs[key];
+      delete soundNames[key];
+      renderSoundsList();
+    });
+  });
+}
+
+function loadSoundIntoMemory(key, blob, name){
+  if(soundURLs[key]) URL.revokeObjectURL(soundURLs[key]);
+  soundURLs[key] = URL.createObjectURL(blob);
+  soundNames[key] = name;
+}
+
+function playSound(key){
+  const url = soundURLs[key];
+  if(!url) return;
+  const audio = new Audio(url);
+  audio.play().catch(()=>{
+    showToast("افتح \"بدء الاستماع\" مرة الأول عشان المتصفح يسمح بتشغيل الصوت تلقائيًا");
+  });
+  pulseLantern();
+}
+
+/* ============================ القنديل والتوست ============================ */
+function pulseLantern(){
+  const lantern = document.getElementById("lantern");
+  const glow = document.getElementById("glow");
+  lantern.classList.remove("pulse"); void lantern.offsetWidth; lantern.classList.add("pulse");
+  glow.classList.remove("pulse"); void glow.offsetWidth; glow.classList.add("pulse");
+}
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>t.classList.remove("show"), 3200);
+}
+
+/* ============================ حالة الاتصال ============================ */
+function setStatus(online){
+  document.getElementById("statusDot").classList.toggle("online", online);
+  document.getElementById("statusText").textContent = online ? "متصل بالبوت ويستمع للإشعارات" : "غير متصل بالبوت";
+  document.getElementById("glow").classList.toggle("online", online);
+}
+
+/* ============================ سجل الإشعارات ============================ */
+const TYPE_LABELS = { adhan:"أذان", wird:"ورد", azkar:"أذكار", reminder:"تذكير" };
+function addLogEntry(evt){
+  const log = document.getElementById("eventLog");
+  const empty = log.querySelector(".log-empty");
+  if(empty) empty.remove();
+  const row = document.createElement("div");
+  row.className = "log-item";
+  const time = new Date(evt.ts*1000).toLocaleTimeString("ar-EG", {hour:"2-digit", minute:"2-digit"});
+  row.innerHTML = `
+    <span class="log-badge">${TYPE_LABELS[evt.type] || evt.type}</span>
+    <div>
+      <div class="log-text">${(evt.title || evt.text || "").toString()}</div>
+      <div class="log-time">${time}</div>
+    </div>
+  `;
+  log.prepend(row);
+  while(log.children.length > 12) log.removeChild(log.lastChild);
+}
+
+/* ============================ الاستماع للجسر (polling) ============================ */
+async function pollOnce(){
+  const base = document.getElementById("bridgeUrl").value.trim().replace(/\/+$/,"");
+  const userId = document.getElementById("userId").value.trim();
+  if(!base || !userId) return;
+  try{
+    const res = await fetch(`${base}/events?user_id=${encodeURIComponent(userId)}&after=${lastEventId}`);
+    const data = await res.json();
+    setStatus(true);
+    if(data.ok){
+      lastEventId = data.last_id || lastEventId;
+      (data.events || []).forEach(evt=>{
+        addLogEntry(evt);
+        pulseLantern();
+        playSound(evt.type);
+        showToast(evt.title || TYPE_LABELS[evt.type] || "إشعار جديد");
+        if(window.Notification && Notification.permission === "granted"){
+          new Notification("قنديل يقين", { body: evt.title || evt.text || "" });
+        }
+      });
+    }
+  }catch(e){
+    setStatus(false);
+  }
+}
+
+function startListening(){
+  if(polling) return;
+  audioUnlocked = true;
+  // نفتح ونغلق صوت صامت لفتح إذن التشغيل التلقائي في المتصفح
+  const unlock = new Audio();
+  unlock.play().catch(()=>{});
+  if(window.Notification && Notification.permission === "default"){
+    Notification.requestPermission();
+  }
+  polling = true;
+  setStatus(false);
+  pollOnce();
+  pollTimer = setInterval(pollOnce, 5000);
+  showToast("بدأ الاستماع لإشعارات البوت");
+}
+function stopListening(){
+  polling = false;
+  clearInterval(pollTimer);
+  setStatus(false);
+  showToast("تم إيقاف الاستماع");
+}
+
+/* ============================ التهيئة ============================ */
+async function init(){
+  db = await openDB();
+
+  // تحميل الأصوات المحفوظة سابقًا
+  for(const t of SOUND_TYPES){
+    const blob = await idbGet("sounds", t.key);
+    if(blob){
+      const name = (await idbGet("settings", "name_"+t.key)) || "صوت مخصص";
+      loadSoundIntoMemory(t.key, blob, name);
+    }
+  }
+  renderSoundsList();
+
+  // استعادة الإعدادات المحفوظة
+  const savedUrl = await idbGet("settings", "bridgeUrl");
+  const savedUser = await idbGet("settings", "userId");
+  if(savedUrl) document.getElementById("bridgeUrl").value = savedUrl;
+  if(savedUser) document.getElementById("userId").value = savedUser;
+
+  document.getElementById("bridgeUrl").addEventListener("change", e=> idbSet("settings","bridgeUrl", e.target.value.trim()));
+  document.getElementById("userId").addEventListener("change", e=> idbSet("settings","userId", e.target.value.trim()));
+
+  document.getElementById("startBtn").addEventListener("click", startListening);
+  document.getElementById("stopBtn").addEventListener("click", stopListening);
+}
+init();
+</script>
+</body>
+</html>
