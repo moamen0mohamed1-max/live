@@ -1,0 +1,972 @@
+[
+  {
+    "name": "أذان الكويت",
+    "category": "الكويت",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/001.mp3"
+  },
+  {
+    "name": "أذان الفجر - الكويت",
+    "category": "الكويت",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/002.mp3"
+  },
+  {
+    "name": "أذان الفجر - الكويت",
+    "category": "الكويت",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/003.mp3"
+  },
+  {
+    "name": "أذان بروناي",
+    "category": "بروناي",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/004.mp3"
+  },
+  {
+    "name": "أذان بروناي",
+    "category": "بروناي",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/005.mp3"
+  },
+  {
+    "name": "أذان تركيا",
+    "category": "تركيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/006.mp3"
+  },
+  {
+    "name": "أذان تركيا",
+    "category": "تركيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/007.mp3"
+  },
+  {
+    "name": "أذان الفجر - مكة المكرمة",
+    "category": "مكة المكرمة",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/008.mp3"
+  },
+  {
+    "name": "أذان مكة المكرمة",
+    "category": "مكة المكرمة",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/009.mp3"
+  },
+  {
+    "name": "الملا",
+    "category": "مكة المكرمة",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/010.mp3"
+  },
+  {
+    "name": "أذان دبي - الإمارات",
+    "category": "دبي - الإمارات",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/011.mp3"
+  },
+  {
+    "name": "أذان عجمان - الإمارات",
+    "category": "عجمان - الإمارات",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/012.mp3"
+  },
+  {
+    "name": "أذان المدينة المنورة",
+    "category": "المدينة المنورة",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/013.mp3"
+  },
+  {
+    "name": "أذان الفجر - المدينة المنورة",
+    "category": "المدينة المنورة",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/014.mp3"
+  },
+  {
+    "name": "أذان الفجر - القدس",
+    "category": "القدس",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/015.mp3"
+  },
+  {
+    "name": "أذان القدس",
+    "category": "القدس",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/016.mp3"
+  },
+  {
+    "name": "حسين ايرك",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/017.mp3"
+  },
+  {
+    "name": "أذان الفجر - الجزائر",
+    "category": "الجزائر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/018.mp3"
+  },
+  {
+    "name": "أذان الفجر - بروناي",
+    "category": "بروناي",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/019.mp3"
+  },
+  {
+    "name": "أذان سوريا",
+    "category": "سوريا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/020.mp3"
+  },
+  {
+    "name": "أذان الفجر - ماليزيا",
+    "category": "ماليزيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/021.mp3"
+  },
+  {
+    "name": "أذان الفجر - مصر",
+    "category": "مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/022.mp3"
+  },
+  {
+    "name": "الشيخ أبو العينين شعيشع",
+    "category": "القاهرة - مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/023.mp3"
+  },
+  {
+    "name": "الشيخ أحمد نعينع",
+    "category": "القاهرة - مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/024.mp3"
+  },
+  {
+    "name": "الشيخ عبدالباسط عبدالصمد",
+    "category": "القاهرة - مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/025.mp3"
+  },
+  {
+    "name": "الشيخ محمد رفعت",
+    "category": "القاهرة - مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/026.mp3"
+  },
+  {
+    "name": "الشيخ محمد علي البنا",
+    "category": "القاهرة - مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/027.mp3"
+  },
+  {
+    "name": "الشيخ محمود خليل الحصري",
+    "category": "القاهرة - مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/028.mp3"
+  },
+  {
+    "name": "أذان جزر المالديف",
+    "category": "جزر المالديف",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/029.mp3"
+  },
+  {
+    "name": "أذان ماليزيا",
+    "category": "ماليزيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/030.mp3"
+  },
+  {
+    "name": "أذان مسقط - عمان",
+    "category": "مسقط - عمان",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/031.mp3"
+  },
+  {
+    "name": "السيد متولي العال",
+    "category": "لبنان",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/032.mp3"
+  },
+  {
+    "name": "عبدالرزاق صالح",
+    "category": "لبنان",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/033.mp3"
+  },
+  {
+    "name": "أذان الفجر - أم القيوين - الإمارات",
+    "category": "أم القيوين - الإمارات",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/034.mp3"
+  },
+  {
+    "name": "أذان تونس",
+    "category": "تونس",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/035.mp3"
+  },
+  {
+    "name": "أذان الهند",
+    "category": "الهند",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/036.mp3"
+  },
+  {
+    "name": "أذان إندونيسيا",
+    "category": "إندونيسيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/037.mp3"
+  },
+  {
+    "name": "أذان باكستان",
+    "category": "باكستان",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/038.mp3"
+  },
+  {
+    "name": "أحمد فخرو",
+    "category": "قطر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/039-13.mp3"
+  },
+  {
+    "name": "الشيخ البهلول أبوعرقوب",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/040-1.mp3"
+  },
+  {
+    "name": "الشيخ البهلول أبوعرقوب",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/041-1.mp3"
+  },
+  {
+    "name": "الشيخ عبدالباسط عبدالصمد (أذان العشاء)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/042-1.mp3"
+  },
+  {
+    "name": "الشيخ عبدالباسط عبدالصمد",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/043-1.mp3"
+  },
+  {
+    "name": "صهيب هاني",
+    "category": "فلسطين",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/044-1.mp3"
+  },
+  {
+    "name": "حمدان المالكي",
+    "category": "نجران - السعودية",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/045-1.mp3"
+  },
+  {
+    "name": "أذان جورجيا",
+    "category": "جورجيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/046-1.mp3"
+  },
+  {
+    "name": "أحمد نواف المجلاد (أذان الفجر)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/047-1.mp3"
+  },
+  {
+    "name": "أحمد نواف المجلاد",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/048-1.mp3"
+  },
+  {
+    "name": "حاج سليمان مختار",
+    "category": "الجزائر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/049-1.mp3"
+  },
+  {
+    "name": "الشيخ مشاري بن راشد العفاسي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/050-1.mp3"
+  },
+  {
+    "name": "الشيخ مشاري بن راشد العفاسي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/051-1.mp3"
+  },
+  {
+    "name": "الشيخ مشاري بن راشد العفاسي (أذان الفجر)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/052-1.mp3"
+  },
+  {
+    "name": "الشيخ مشاري بن راشد العفاسي (أذان الفجر)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/053-1.mp3"
+  },
+  {
+    "name": "محمد الدمرداش",
+    "category": "حائل - السعودية",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/054-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/055-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/056-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/057-2.mp3"
+  },
+  {
+    "name": "الشيخ الدوكالي",
+    "category": "ليبيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/058-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/059-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/060-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/061-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/062-2.mp3"
+  },
+  {
+    "name": "ناصر العبد الجبار",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/063-2.mp3"
+  },
+  {
+    "name": "أحمد العمادي",
+    "category": "قطر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/064-2.mp3"
+  },
+  {
+    "name": "أحمد العمادي (تكبيرات العيد - ليست أذان)",
+    "category": "قطر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/065-283.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/066-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/067-2.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/068-2.mp3"
+  },
+  {
+    "name": "مصطفى وليد",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/069-2.mp3"
+  },
+  {
+    "name": "الشيخ محمود الطوخي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/070-2.mp3"
+  },
+  {
+    "name": "كمال محمد المروش",
+    "category": "المغرب",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/071-2.mp3"
+  },
+  {
+    "name": "أدم بوصخرة",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/072-3.mp3"
+  },
+  {
+    "name": "أحمد علي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/073-3.mp3"
+  },
+  {
+    "name": "ربيع عبدالرحيم عيسى",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/074-3.mp3"
+  },
+  {
+    "name": "أحمد علي مرتضى",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/075-3.mp3"
+  },
+  {
+    "name": "الشيخ ناصر القطامي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/076-3.mp3"
+  },
+  {
+    "name": "أحمد البطل",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/077-3.mp3"
+  },
+  {
+    "name": "الشيخ رياض الجزائري",
+    "category": "الجزائر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/078-3.mp3"
+  },
+  {
+    "name": "ياسين العساف (أذان الفجر)",
+    "category": "العراق",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/079-3.mp3"
+  },
+  {
+    "name": "إبراهيم جبر",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/080-3.mp3"
+  },
+  {
+    "name": "عثمان المسيمي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/081-3.mp3"
+  },
+  {
+    "name": "إبراهيم الجميلي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/082-3.mp3"
+  },
+  {
+    "name": "الشيخ محمد ناصر الدين الألباني",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/083-3.mp3"
+  },
+  {
+    "name": "الشيخ ياسر الدوسري",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/084-3.mp3"
+  },
+  {
+    "name": "الشيخ محمد صديق",
+    "category": "أفغانستان",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/085-3.mp3"
+  },
+  {
+    "name": "محمد محمد حمود",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/086-3.mp3"
+  },
+  {
+    "name": "الشيخ محمد حمود",
+    "category": "كولومبيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/087-3.mp3"
+  },
+  {
+    "name": "محمد ناجي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/088-3.mp3"
+  },
+  {
+    "name": "الشيخ مختار عبدالحميد حافظ",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/089-3.mp3"
+  },
+  {
+    "name": "أحمد الحراسيس",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/090-3.mp3"
+  },
+  {
+    "name": "محمد ناجي (أذان الفجر)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/091-3.mp3"
+  },
+  {
+    "name": "أبو ياسر الجزائري",
+    "category": "الجزائر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/092-3.mp3"
+  },
+  {
+    "name": "الشيخ محمد صلاح الدين كبارة (مقام رست)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/093-3.mp3"
+  },
+  {
+    "name": "الشيخ محمد صلاح الدين كبارة (حجازي)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/094-3.mp3"
+  },
+  {
+    "name": "الشيخ عبد المنعم عبد المبدئ",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/095-3.mp3"
+  },
+  {
+    "name": "الحسين سيد عبد العاطي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/096-3.mp3"
+  },
+  {
+    "name": "عبدالله المكنوي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/097-3.mp3"
+  },
+  {
+    "name": "اخدام بن المداني",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/098-3.mp3"
+  },
+  {
+    "name": "الشيخ ناصر العبد",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/099-3.mp3"
+  },
+  {
+    "name": "الشيخ طارق فتحي أحمد",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/100-3.mp3"
+  },
+  {
+    "name": "ياسين العساف (أذان العشاء)",
+    "category": "بغداد - العراق",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/101-3.mp3"
+  },
+  {
+    "name": "محمد ناجي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/102-3.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/103.mp3"
+  },
+  {
+    "name": "أحمد الطرابلسي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/104-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/105.mp3"
+  },
+  {
+    "name": "د. هشام خليل",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/106-4.mp3"
+  },
+  {
+    "name": "أحمد الطرابلسي (أذان الفجر)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/107-4.mp3"
+  },
+  {
+    "name": "أحمد الطرابلسي (أذان الفجر 2)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/108-4.mp3"
+  },
+  {
+    "name": "أحمد الطرابلسي (حجازي)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/109-4.mp3"
+  },
+  {
+    "name": "أحمد الطرابلسي (رصد)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/110-4.mp3"
+  },
+  {
+    "name": "أحمد الطرابلسي (رصد 2)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/111-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/112.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/113.mp3"
+  },
+  {
+    "name": "إبراهيم جبر أبو رحيق",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/114-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/115.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/116.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/117-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/118.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/119.mp3"
+  },
+  {
+    "name": "الشيخ ناصر القطامي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/120-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/121.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/122.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/123.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/124.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/125.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/126.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/127.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/128.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/129.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/130.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/131.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/132.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/133.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/134.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/135.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/136.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/137.mp3"
+  },
+  {
+    "name": "الشيخ أحمد الحداد",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/138-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/139.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/140.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/141.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/142.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/143.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/144.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/145.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/146.mp3"
+  },
+  {
+    "name": "الشيخ حمزة الحلبية",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/147.mp3"
+  },
+  {
+    "name": "الشيخ مصطفى إسماعيل",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/148.mp3"
+  },
+  {
+    "name": "عبدالكريم جباري",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/149.mp3"
+  },
+  {
+    "name": "الشيخ محمود مصطفى النجار",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/150-4.mp3"
+  },
+  {
+    "name": "الشيخ عبد الرحمن كساب",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/151-4.mp3"
+  },
+  {
+    "name": "سامر الصغير",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/152-4.mp3"
+  },
+  {
+    "name": "الشيخ عبدالباسط عبدالصمد (أذان الفجر 1)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/153-4.mp3"
+  },
+  {
+    "name": "الشيخ عبدالباسط عبدالصمد (أذان الفجر 2)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/154-4.mp3"
+  },
+  {
+    "name": "أحمد علي",
+    "category": "مصر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/155-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/156-4.mp3"
+  },
+  {
+    "name": "محمد إبراهيم إسماعيل عبدالله",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/157-4.mp3"
+  },
+  {
+    "name": "أذان كينيا",
+    "category": "كينيا",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/158-4.mp3"
+  },
+  {
+    "name": "الشيخ بديع جادو",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/159-4.mp3"
+  },
+  {
+    "name": "الشيخ بن سونة",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/160-4.mp3"
+  },
+  {
+    "name": "الشيخ بن سونة",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/161-4.mp3"
+  },
+  {
+    "name": "الشيخ عبدالرحمن كساب",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/162-4.mp3"
+  },
+  {
+    "name": "الشيخ فارس عبدالغني",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/163-4.mp3"
+  },
+  {
+    "name": "الشيخ حسن محمود بري",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/164-4.mp3"
+  },
+  {
+    "name": "الشيخ عزالدين عمارنة",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/165-4.mp3"
+  },
+  {
+    "name": "الشيخ أحمد العاني (نهاوند)",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/166-4.mp3"
+  },
+  {
+    "name": "بديع جادو",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/167-4.mp3"
+  },
+  {
+    "name": "بديع جادو",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/168-4.mp3"
+  },
+  {
+    "name": "الأمين محمد قنيوه",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/169-4.mp3"
+  },
+  {
+    "name": "زايد آل عطية",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/170-4.mp3"
+  },
+  {
+    "name": "الشيخ وليد مهساس",
+    "category": "الجزائر",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/171-4.mp3"
+  },
+  {
+    "name": "الشيخ جمال عبد الحميد الجعفري",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/172-4.mp3"
+  },
+  {
+    "name": "إسلام ياسين",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/173-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/174-4.mp3"
+  },
+  {
+    "name": "الشيخ عيسى الحجلاوي",
+    "category": "غير محدد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/175-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/176-4.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/177-.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/178-A.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "https://archive.org/download/Athan_Mawsoa_mp3/179-A.mp3"
+  },
+  {
+    "name": "الشيخ عبدالباسط عبدالصمد",
+    "category": "غير محدد",
+    "file": "Athan Abed Albase6.mp3"
+  },
+  {
+    "name": "الشيخ أحمد نعينع",
+    "category": "القاهرة - مصر",
+    "file": "Athan Ahmad Nuyne3.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "Athan Al-fajer - Malek chebae.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "Athan Ghazi A-Sa'adoni.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "Athan Hamad Deghreri.mp3"
+  },
+  {
+    "name": "حمدان المالكي",
+    "category": "نجران - السعودية",
+    "file": "Athan Hamdan Almalki.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "Athan Ibrahim Al-Arkani.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "Athan Majed Al-hamathani.mp3"
+  },
+  {
+    "name": "أذان مكة المكرمة",
+    "category": "مكة المكرمة",
+    "file": "Athan Makkah.mp3"
+  },
+  {
+    "name": "الشيخ منصور الزهراني",
+    "category": "مكة المكرمة - السعودية",
+    "file": "Athan Mansoor Az-Zahrani.mp3"
+  },
+  {
+    "name": "الشيخ مشاري بن راشد العفاسي",
+    "category": "الكويت",
+    "file": "Athan Mishary Alafasi.mp3"
+  },
+  {
+    "name": "الشيخ محمد صديق المنشاوي",
+    "category": "مصر",
+    "file": "Athan Mohammad Almenshawy.mp3"
+  },
+  {
+    "name": "الشيخ محمد رفعت",
+    "category": "القاهرة - مصر",
+    "file": "Athan Mohammad Ref3at.mp3"
+  },
+  {
+    "name": "الشيخ ناصر القطامي",
+    "category": "غير محدد",
+    "file": "Athan Nasser Alqatami.mp3"
+  },
+  {
+    "name": "غير معروف",
+    "category": "المزيد",
+    "file": "Athan Suhaib Khatba.mp3"
+  }
+]
