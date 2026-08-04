@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>السبحة — المؤمن</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1215;
+    --gold:#C9A227;
+    --gold-bright:#E8C766;
+    --ink:#F1ECDD;
+    --muted:#8B9096;
+    --ring-track: rgba(201,162,39,0.16);
+    --neon-red:#ff2b45;
+    --neon-red-glow: rgba(255,43,69,0.65);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+  html,body{ height:100%; margin:0; overscroll-behavior:none; }
+  body{
+    background: radial-gradient(120% 90% at 50% -10%, #1b2126 0%, var(--bg) 55%);
+    color:var(--ink);
+    font-family:'Tajawal',sans-serif;
+    display:flex; flex-direction:column; min-height:100vh;
+    touch-action: manipulation;
+  }
+  header{ padding: max(18px, env(safe-area-inset-top)) 20px 6px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .app-title{
+    font-family:'Reem Kufi',sans-serif; font-weight:500; font-size:clamp(18px, 5.4vw, 23px);
+    letter-spacing:.08em; margin:0; flex:1; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(120deg, #a9822a 0%, var(--gold-bright) 32%, #fff6dc 50%, var(--gold-bright) 68%, #a9822a 100%);
+    background-size:240% auto;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 20px rgba(232,199,102,.4);
+    animation: shimmer 6s ease-in-out infinite;
+  }
+  .app-title::before, .app-title::after{
+    content:''; flex:1 1 auto; max-width:22px; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(201,162,39,.75));
+  }
+  .app-title::after{ background:linear-gradient(90deg, rgba(201,162,39,.75), transparent); }
+  @keyframes shimmer{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
+  .header-controls{ display:flex; align-items:center; gap:8px; }
+  #modeBtn{
+    background:rgba(80,220,190,.06); border:1px solid #4fd8c4; color:#4fd8c4;
+    font-family:'Tajawal',sans-serif; font-size:12px; padding:7px 12px; border-radius:999px; cursor:pointer;
+    text-shadow:0 0 6px rgba(79,216,196,.6), 0 0 14px rgba(79,216,196,.6);
+    box-shadow:0 0 8px rgba(79,216,196,.3), inset 0 0 8px rgba(79,216,196,.1);
+    transition: transform .15s, box-shadow .2s, background .2s, color .2s;
+  }
+  #modeBtn:active{ transform:scale(.96); }
+  #modeBtn:focus-visible{ outline:2px solid #4fd8c4; outline-offset:2px; }
+  #modeBtn.active{
+    color:#04140f; background:#4fd8c4; border-color:#4fd8c4;
+    text-shadow:none;
+    box-shadow:0 0 16px rgba(79,216,196,.65), 0 0 32px rgba(79,216,196,.5);
+  }
+
+  #soundBtn{
+    --neon-violet:#b088ff; --neon-violet-glow: rgba(176,136,255,.65);
+    display:flex; align-items:center; justify-content:center;
+    width:30px; height:30px; padding:0; margin-inline-start:2px;
+    border-radius:50%; cursor:pointer;
+    background:rgba(176,136,255,.06); border:1px solid var(--neon-violet); color:var(--neon-violet);
+    box-shadow:0 0 8px rgba(176,136,255,.35), inset 0 0 8px rgba(176,136,255,.12);
+    transition: transform .15s, box-shadow .2s, color .2s, border-color .2s, background .2s;
+  }
+  #soundBtn svg{ width:15px; height:15px; filter:drop-shadow(0 0 4px var(--neon-violet-glow)); }
+  #soundBtn:active{ transform:scale(.88); }
+  #soundBtn:focus-visible{ outline:2px solid var(--neon-violet); outline-offset:2px; }
+  #soundBtn.muted{
+    color:var(--muted); border-color:rgba(139,144,150,.45);
+    background:rgba(139,144,150,.05); box-shadow:none;
+  }
+  #soundBtn.muted svg{ filter:none; }
+
+  .sound-control{ position:relative; display:flex; align-items:center; }
+  .volume-popup{
+    position:absolute; top:calc(100% + 10px); right:50%; transform:translateX(50%) translateY(-6px);
+    background:#14181c; border:1px solid rgba(176,136,255,.35); border-radius:12px;
+    padding:12px 14px; min-width:170px;
+    box-shadow:0 8px 24px rgba(0,0,0,.45), 0 0 14px rgba(176,136,255,.2);
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:40;
+    display:flex; flex-direction:column; gap:10px;
+  }
+
+  #trophyBtn{
+    position:absolute; top:calc(100% + 8px); right:50%; transform:translateX(50%) translateY(0);
+    display:flex; align-items:center; justify-content:center;
+    width:28px; height:28px; padding:0;
+    border-radius:50%; cursor:pointer; z-index:35;
+    background:rgba(232,199,102,.07); border:1px solid var(--gold-bright); color:var(--gold-bright);
+    box-shadow:0 0 8px rgba(232,199,102,.4), inset 0 0 8px rgba(232,199,102,.14);
+    transition: transform .38s cubic-bezier(.4,0,.2,1), box-shadow .2s, background .2s;
+  }
+  #trophyBtn svg{ width:15px; height:15px; filter:drop-shadow(0 0 5px rgba(232,199,102,.75)); }
+  #trophyBtn:active{ transform:translateX(50%) translateY(0) scale(.88); }
+  .sound-control.popup-open #trophyBtn{ transform:translateX(50%) translateY(104px); }
+  .sound-control.popup-open #trophyBtn:active{ transform:translateX(50%) translateY(104px) scale(.88); }
+  #trophyBtn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+
+  .prizes-box{ width:min(88vw, 340px); text-align:right; max-height:82vh; overflow-y:auto; }
+  .prizes-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .prizes-header h2{ font-family:'Reem Kufi',sans-serif; font-size:17px; color:var(--gold-bright); margin:0; text-shadow:0 0 10px rgba(232,199,102,.5); }
+  #closePrizesBtn{
+    background:none; border:none; color:var(--muted); font-size:18px; line-height:1; cursor:pointer; padding:4px;
+  }
+  .prizes-me{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:linear-gradient(160deg, rgba(232,199,102,.14), rgba(201,162,39,.05));
+    border:1px solid rgba(201,162,39,.35); border-radius:12px; padding:10px 12px; margin-bottom:12px;
+  }
+  .prizes-me-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .prizes-me-name{ font-size:14px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px; }
+  .prizes-me-stats{ font-size:11px; color:var(--muted); display:flex; gap:8px; }
+  #prizesHideBtn{
+    flex-shrink:0; font-family:'Tajawal',sans-serif; font-size:11px; font-weight:700;
+    padding:7px 10px; border-radius:999px; cursor:pointer;
+    background:rgba(176,136,255,.08); border:1px solid rgba(176,136,255,.4); color:#b088ff;
+    transition: transform .15s, background .2s, color .2s, border-color .2s;
+  }
+  #prizesHideBtn:active{ transform:scale(.94); }
+  #prizesHideBtn.active{ background:rgba(139,144,150,.1); border-color:rgba(139,144,150,.45); color:var(--muted); }
+  .prizes-warning{ font-size:12.5px; color:var(--muted); text-align:center; padding:14px 6px; line-height:1.6; }
+  .prizes-register{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  .prizes-register-hint{ font-size:12px; color:var(--muted); line-height:1.6; margin:0 0 2px; }
+  .prizes-register input{
+    width:100%; font-family:'Tajawal',sans-serif; font-size:13px; color:var(--ink);
+    background:#0F1215; border:1px solid rgba(201,162,39,.35); border-radius:10px;
+    padding:10px 12px; outline:none;
+  }
+  .prizes-register input:focus{ border-color:var(--gold-bright); box-shadow:0 0 8px rgba(232,199,102,.3); }
+  #regSaveBtn{
+    font-family:'Tajawal',sans-serif; font-size:13px; font-weight:700; cursor:pointer;
+    padding:10px; border-radius:10px;
+    background:rgba(232,199,102,.1); border:1px solid var(--gold-bright); color:var(--gold-bright);
+    box-shadow:0 0 8px rgba(232,199,102,.3), inset 0 0 8px rgba(232,199,102,.1);
+    transition: transform .15s;
+  }
+  #regSaveBtn:active{ transform:scale(.97); }
+  .prizes-list{ list-style:none; margin:0 0 8px; padding:0; display:flex; flex-direction:column; gap:6px; }
+  .prize-item{
+    display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px;
+    background:linear-gradient(180deg, #1a1e22, #14171a); border:1px solid rgba(255,255,255,.05);
+  }
+  .prize-item.top3{ border-color:rgba(201,162,39,.4); background:linear-gradient(180deg, #201c14, #16130e); }
+  .prize-rank{ font-size:15px; min-width:22px; text-align:center; color:var(--gold-bright); font-weight:700; }
+  .prize-name{ flex:1; font-size:13px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .prize-total{ font-size:13px; font-weight:700; color:var(--gold-bright); }
+  .prizes-loading{ text-align:center; font-size:12.5px; color:var(--muted); padding:10px; }
+  .prizes-note{ text-align:center; font-size:10.5px; color:var(--muted); opacity:.7; margin-top:6px; }
+  .volume-popup.show{ opacity:1; pointer-events:auto; transform:translateX(50%) translateY(0); }
+  .volume-row{ display:flex; align-items:center; gap:8px; width:100%; }
+  .volume-popup input[type="range"]{
+    flex:1; height:3px; accent-color:#b088ff; cursor:pointer;
+  }
+  .volume-popup .vlbl{ font-size:11px; color:var(--muted); min-width:26px; text-align:center; }
+
+  #muteToggleBtn{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    width:100%; padding:8px 10px; border-radius:10px; cursor:pointer;
+    background:rgba(176,136,255,.08); border:1px solid rgba(176,136,255,.4); color:var(--neon-violet, #b088ff);
+    font-family:'Tajawal',sans-serif; font-size:12px; font-weight:700;
+    transition: transform .15s, background .2s, border-color .2s, color .2s;
+  }
+  #muteToggleBtn:active{ transform:scale(.96); }
+  #muteToggleBtn svg{ width:14px; height:14px; flex-shrink:0; }
+  #muteToggleBtn.is-muted{
+    background:rgba(139,144,150,.08); border-color:rgba(139,144,150,.4); color:var(--muted);
+  }
+
+  #resetBtn{
+    background:rgba(255,43,69,.06); border:1px solid var(--neon-red); color:var(--neon-red);
+    font-family:'Tajawal',sans-serif; font-size:12px; padding:7px 12px; border-radius:999px; cursor:pointer;
+    text-shadow:0 0 6px var(--neon-red-glow), 0 0 14px var(--neon-red-glow);
+    box-shadow:0 0 8px rgba(255,43,69,.35), inset 0 0 8px rgba(255,43,69,.12);
+    transition: transform .15s, box-shadow .2s;
+  }
+  #resetBtn:active{ transform:scale(.96); }
+  #resetBtn:focus-visible{ outline:2px solid var(--neon-red); outline-offset:2px; }
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(5,7,9,.72); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center; z-index:50;
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    background:#14181c; border:1px solid rgba(255,255,255,.08); border-radius:18px;
+    padding:24px 22px; width:min(84vw, 300px); text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);
+  }
+  .modal-box p{ font-family:'Reem Kufi',sans-serif; font-size:16px; color:var(--ink); margin:0 0 18px; }
+  .modal-actions{ display:flex; gap:12px; }
+  .modal-actions button{
+    flex:1; font-family:'Tajawal',sans-serif; font-size:14px; font-weight:700;
+    padding:11px 8px; border-radius:12px; cursor:pointer; transition: transform .15s, opacity .2s, box-shadow .2s;
+  }
+  .modal-actions button:active{ transform:scale(.96); }
+  #cancelBtn{
+    background:rgba(255,43,69,.1); border:1px solid var(--neon-red); color:var(--neon-red);
+    text-shadow:0 0 6px var(--neon-red-glow);
+    box-shadow:0 0 8px rgba(255,43,69,.3), inset 0 0 8px rgba(255,43,69,.1);
+  }
+  #confirmBtn{
+    background:rgba(60,210,120,.1); border:1px solid #3cd278; color:#3cd278;
+    text-shadow:0 0 6px rgba(60,210,120,.55);
+    box-shadow:0 0 8px rgba(60,210,120,.3), inset 0 0 8px rgba(60,210,120,.1);
+  }
+  #confirmBtn:disabled{
+    opacity:.45; cursor:not-allowed; box-shadow:none; text-shadow:none;
+  }
+
+  main{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px 20px 0; gap:18px; }
+
+  .ring-wrap{ position:relative; width:min(64vw, 260px); aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; }
+  svg.ring{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); overflow:visible; }
+  .ring-track{ fill:none; stroke:var(--ring-track); stroke-width:4; }
+  .ring-progress{ fill:none; stroke:var(--gold); stroke-width:4; stroke-linecap:round; transition: stroke-dashoffset .09s linear, stroke .2s; }
+  body.unlimited-mode .ring-progress{ stroke:#4fd8c4; }
+  .ring-glow{
+    position:absolute; inset:6%; border-radius:50%;
+    background: radial-gradient(circle, rgba(201,162,39,.4) 0%, transparent 72%);
+    filter: blur(9px);
+    pointer-events:none;
+    transition: background .2s;
+  }
+  body.unlimited-mode .ring-glow{ background: radial-gradient(circle, rgba(79,216,196,.45) 0%, transparent 72%); }
+
+  .count{ font-family:'Reem Kufi',sans-serif; font-size:clamp(56px, 18vw, 92px); line-height:1; color:var(--ink); font-weight:700; letter-spacing:.02em; }
+  .count-label{ position:absolute; bottom:14%; font-size:12px; color:var(--muted); letter-spacing:.08em; }
+
+  .stats{
+    display:flex; position:relative;
+    padding:2px; border-radius:18px;
+    background:linear-gradient(160deg, rgba(232,199,102,.5), rgba(201,162,39,.08) 40%, rgba(201,162,39,.25));
+    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 18px rgba(201,162,39,.15);
+  }
+  .stat{
+    position:relative; text-align:center; padding:14px 30px 12px; min-width:104px;
+    border-radius:16px;
+    background:linear-gradient(180deg, #1a1e22, #14171a);
+  }
+  .stat + .stat::before{
+    content:''; position:absolute; right:100%; top:14%; bottom:14%; width:1px;
+    background:linear-gradient(180deg, transparent, rgba(201,162,39,.45), transparent);
+  }
+  .stat .num{
+    font-family:'Reem Kufi',sans-serif; font-size:26px; color:var(--gold-bright);
+    text-shadow:0 0 10px rgba(232,199,102,.65), 0 0 24px rgba(232,199,102,.25);
+    letter-spacing:.02em;
+  }
+  .stat .lbl{ font-size:10.5px; color:var(--muted); margin-top:4px; letter-spacing:.04em; }
+
+  .dhikr-label{ font-size:14px; color:var(--muted); text-align:center; max-width:280px; }
+
+  .tap-zone{
+    position:relative; margin-top:auto; width:100%; height:38vh; min-height:230px;
+    background: linear-gradient(180deg, rgba(201,162,39,0.05), rgba(201,162,39,0.09));
+    border-top:1px solid rgba(201,162,39,.18);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; cursor:pointer; touch-action:none;
+    contain: layout paint;
+  }
+  .tap-zone .hint{ font-family:'Reem Kufi',sans-serif; font-size:15px; color:var(--gold); opacity:.55; letter-spacing:.06em; pointer-events:none; transition:opacity .3s; }
+  .tap-zone.tapped .hint{ opacity:.25; }
+  .tap-zone .pulse-ring{ position:absolute; width:120px; height:120px; border-radius:50%; border:1px solid rgba(201,162,39,.35); animation: breathe 3.2s ease-in-out infinite; pointer-events:none; will-change: transform, opacity; }
+  @keyframes breathe{ 0%,100%{ transform:scale(1); opacity:.5;} 50%{ transform:scale(1.35); opacity:0;} }
+
+  .ripple{ position:absolute; width:14px; height:14px; margin:-7px 0 0 -7px; border-radius:50%; background:var(--gold-bright); pointer-events:none; animation: rip .3s ease-out forwards; will-change: transform, opacity; }
+  @keyframes rip{ 0%{ transform:scale(.4); opacity:.9;} 100%{ transform:scale(7); opacity:0;} }
+
+  footer{ text-align:center; padding:10px; font-size:11px; color:var(--muted); opacity:.6; }
+
+  #telegramBtn{
+    --tg:#2AABEE; --tg-glow: rgba(42,171,238,.65);
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin:14px auto 0; width:max-content;
+    background:rgba(42,171,238,.06); border:1px solid var(--tg); color:var(--tg);
+    font-family:'Tajawal',sans-serif; font-size:13px; font-weight:700;
+    padding:9px 20px; border-radius:999px; text-decoration:none;
+    text-shadow:0 0 6px var(--tg-glow), 0 0 14px var(--tg-glow);
+    box-shadow:0 0 10px rgba(42,171,238,.35), inset 0 0 10px rgba(42,171,238,.12);
+    transition: transform .15s, box-shadow .2s;
+  }
+  #telegramBtn svg{ filter:drop-shadow(0 0 5px var(--tg-glow)); }
+  #telegramBtn:active{ transform:scale(.96); }
+  #telegramBtn:focus-visible{ outline:2px solid var(--tg); outline-offset:2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .pulse-ring{ animation:none; }
+    .ripple{ animation:none; opacity:0; }
+    .ring-progress{ transition:none; }
+    .brand b{ animation:none; }
+  }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+</style>
+</head>
+<body>
+  <header>
+    <div class="header-controls">
+        <div class="sound-control">
+          <button id="soundBtn" type="button" aria-label="إظهار خيارات الصوت" aria-expanded="false" aria-haspopup="true">
+            <svg id="soundIconOn" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M4 9v6h4l5 5V4L8 9H4z"/>
+              <path fill="currentColor" d="M16.4 12c0-1.77-.77-3.29-2-4.4v8.8c1.23-1.11 2-2.63 2-4.4z"/>
+              <path fill="currentColor" d="M14.4 5.3v1.7c2.5 1.1 4.2 3.6 4.2 6.5s-1.7 5.4-4.2 6.5v1.7c3.4-1.15 5.8-4.3 5.8-8.2s-2.4-7.05-5.8-8.2z" opacity=".55"/>
+            </svg>
+            <svg id="soundIconOff" viewBox="0 0 24 24" aria-hidden="true" style="display:none">
+              <path fill="currentColor" d="M4 9v6h4l5 5V4L8 9H4z"/>
+              <path fill="currentColor" d="M19.1 12l2.1-2.1-1-1-2.1 2.1-2.1-2.1-1 1 2.1 2.1-2.1 2.1 1 1 2.1-2.1 2.1 2.1 1-1z"/>
+            </svg>
+          </button>
+          <div class="volume-popup" id="volumePopup">
+            <div class="volume-row">
+              <span class="vlbl" id="volumeLbl">٨٥٪</span>
+              <input type="range" id="volumeSlider" min="0" max="100" value="85" step="5" aria-label="مستوى صوت النقر">
+            </div>
+            <button id="muteToggleBtn" type="button" aria-pressed="false">
+              <svg id="muteIconOn" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M4 9v6h4l5 5V4L8 9H4z"/>
+                <path fill="currentColor" d="M16.4 12c0-1.77-.77-3.29-2-4.4v8.8c1.23-1.11 2-2.63 2-4.4z"/>
+              </svg>
+              <svg id="muteIconOff" viewBox="0 0 24 24" aria-hidden="true" style="display:none">
+                <path fill="currentColor" d="M4 9v6h4l5 5V4L8 9H4z"/>
+                <path fill="currentColor" d="M19.1 12l2.1-2.1-1-1-2.1 2.1-2.1-2.1-1 1 2.1 2.1-2.1 2.1 1 1 2.1-2.1 2.1 2.1 1-1z"/>
+              </svg>
+              <span id="muteToggleLbl">كتم الصوت</span>
+            </button>
+          </div>
+          <button id="trophyBtn" type="button" aria-label="قائمة الجوائز" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.99 5.99 0 0 0 11 15.9V18H7v2h10v-2h-4v-2.1a5.99 5.99 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+            </svg>
+          </button>
+        </div>
+        <button id="resetBtn" type="button">إعادة الضبط</button>
+        <button id="modeBtn" type="button">بدون حد</button>
+      </div>
+    <h1 class="app-title">سبحة المؤمن</h1>
+  </header>
+
+  <main>
+    <div class="ring-wrap">
+      <div class="ring-glow"></div>
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-track" cx="50" cy="50" r="46"></circle>
+        <circle id="ringProgress" class="ring-progress" cx="50" cy="50" r="46" stroke-dasharray="289" stroke-dashoffset="289"></circle>
+      </svg>
+      <div class="count" id="countDisplay">٠</div>
+      <div class="count-label" id="countLabel">من ٣٣</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num" id="roundsDisplay">٠</div><div class="lbl">دورات مكتملة</div></div>
+      <div class="stat"><div class="num" id="totalDisplay">٠</div><div class="lbl">الإجمالي الكلي</div></div>
+    </div>
+
+    <p class="dhikr-label">سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر</p>
+  </main>
+
+  <div class="tap-zone" id="tapZone" role="button" tabindex="0" aria-label="اضغط هنا لعد التسبيح">
+    <div class="pulse-ring"></div>
+    <div class="hint">المس هنا للتسبيح</div>
+  </div>
+
+  <div class="sr-only" aria-live="polite" id="liveRegion"></div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <p>هل أنت متأكد؟</p>
+      <div class="modal-actions">
+        <button id="cancelBtn" type="button">لا</button>
+        <button id="confirmBtn" type="button" disabled>نعم (٣)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="prizesModalOverlay">
+    <div class="modal-box prizes-box">
+      <div class="prizes-header">
+        <h2>🏆 قائمة الجوائز</h2>
+        <button id="closePrizesBtn" type="button" aria-label="إغلاق">✕</button>
+      </div>
+
+      <div class="prizes-register" id="prizesRegisterSection" style="display:none">
+        <p class="prizes-register-hint">أول مرة؟ اكتب رقم حسابك (ID) في تيليجرام مرة واحدة بس، وهيتحفظ تلقائي بعد كده. اسمك هيتسحب تلقائي من تيليجرام.</p>
+        <input type="text" inputmode="numeric" id="regIdInput" placeholder="رقم حسابك (ID) في تيليجرام">
+        <button id="regSaveBtn" type="button">حفظ والدخول</button>
+      </div>
+
+      <div class="prizes-me" id="prizesMeSection" style="display:none">
+        <div class="prizes-me-info">
+          <div class="prizes-me-name" id="prizesMeName">—</div>
+          <div class="prizes-me-stats">
+            <span id="prizesMeRank">—</span>
+            <span id="prizesMeTotal">٠ ضغطة</span>
+          </div>
+        </div>
+        <button id="prizesHideBtn" type="button">إخفاء اسمي</button>
+      </div>
+
+      <ol class="prizes-list" id="prizesList"></ol>
+      <div class="prizes-loading" id="prizesLoading">جارِ التحميل...</div>
+      <div class="prizes-note">القائمة تُصفَّر تلقائيًا كل ٧ أيام</div>
+    </div>
+  </div>
+
+  <a href="https://t.me/K4_X7" target="_blank" rel="noopener noreferrer" id="telegramBtn">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="currentColor" d="M21.94 4.11c.26-1.13-.86-2.03-1.9-1.6L2.4 9.83c-1.03.42-1 1.91.05 2.28l4.36 1.53 1.7 5.4c.28.9 1.42 1.15 2.05.45l2.36-2.6 4.28 3.2c.9.67 2.2.18 2.44-.93L21.94 4.11zM8.53 13.1l9.4-6.02c.3-.2.6.2.34.44l-7.7 7.03a1 1 0 0 0-.3.53l-.26 1.98-.7-2.6a1 1 0 0 1 .22-1.36z"/>
+    </svg>
+    <span>تيليجرام</span>
+  </a>
+
+  <footer>العدّاد يعمل خلال الجلسة الحالية فقط</footer>
+
+<script>
+(function(){
+  // ⚠️ حط هنا رابط سيرفر البوت على الـ VPS (نفس البورت TASBIH_API_PORT في Al-Moamen.py)
+  // افتح الصفحة دايمًا من الرابط ده نفسه (مش من GitHub Pages) عشان تفادي مشاكل http/https
+  const TASBIH_API_BASE = "http://YOUR_VPS_IP:8420";
+  const EAST_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+  function toEastern(n){ return String(n).replace(/[0-9]/g, d => EAST_DIGITS[d]); }
+
+  const ROUND = 33;
+  const MAX_TOTAL = 999999;
+  const CIRC = 2 * Math.PI * 46;
+
+  let inRound = 0;
+  let rounds = 0;
+  let total = 0;
+  let unlimited = false;
+
+  const countEl = document.getElementById('countDisplay');
+  const countLabelEl = document.getElementById('countLabel');
+  const roundsEl = document.getElementById('roundsDisplay');
+  const totalEl = document.getElementById('totalDisplay');
+  const ringEl = document.getElementById('ringProgress');
+  const tapZone = document.getElementById('tapZone');
+  let tapRect = tapZone.getBoundingClientRect();
+  function updateTapRect(){ tapRect = tapZone.getBoundingClientRect(); }
+  window.addEventListener('resize', updateTapRect, { passive:true });
+  window.addEventListener('orientationchange', updateTapRect, { passive:true });
+  const liveRegion = document.getElementById('liveRegion');
+  const resetBtn = document.getElementById('resetBtn');
+  const modeBtn = document.getElementById('modeBtn');
+  const soundBtn = document.getElementById('soundBtn');
+  const soundIconOn = document.getElementById('soundIconOn');
+  const soundIconOff = document.getElementById('soundIconOff');
+  const volumePopup = document.getElementById('volumePopup');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const volumeLbl = document.getElementById('volumeLbl');
+  const muteToggleBtn = document.getElementById('muteToggleBtn');
+  const muteIconOn = document.getElementById('muteIconOn');
+  const muteIconOff = document.getElementById('muteIconOff');
+  const muteToggleLbl = document.getElementById('muteToggleLbl');
+  const soundControl = document.querySelector('.sound-control');
+  const trophyBtn = document.getElementById('trophyBtn');
+  const prizesModalOverlay = document.getElementById('prizesModalOverlay');
+  const closePrizesBtn = document.getElementById('closePrizesBtn');
+  const prizesRegisterSection = document.getElementById('prizesRegisterSection');
+  const regIdInput = document.getElementById('regIdInput');
+  const regSaveBtn = document.getElementById('regSaveBtn');
+  const prizesMeSection = document.getElementById('prizesMeSection');
+  const prizesMeName = document.getElementById('prizesMeName');
+  const prizesMeRank = document.getElementById('prizesMeRank');
+  const prizesMeTotal = document.getElementById('prizesMeTotal');
+  const prizesHideBtn = document.getElementById('prizesHideBtn');
+  const prizesList = document.getElementById('prizesList');
+  const prizesLoading = document.getElementById('prizesLoading');
+
+  // ── تسجيل بسيط بمرة واحدة: رقم حساب تيليجرام + اسم، محفوظين محليًا ────
+  let myId = localStorage.getItem('tasbih_my_id') || '';
+  let myName = localStorage.getItem('tasbih_my_name') || '';
+  let lastSyncedTotal = parseInt(localStorage.getItem('tasbih_last_synced_total') || '0', 10) || 0;
+  let hideName = localStorage.getItem('tasbih_hide_name') === '1';
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  // ── الصوت ─────────────────────────────────────────────
+  let audioCtx = null;
+  let masterGain = null;
+  let muted = false;
+  let volume = 0.85;
+  let volumePopupTimer = null;
+
+  // مدى واسع وواضح بين أقل صوت وأعلى صوت
+  function volumeLevel(){
+    return 0.05 + volume * 1.85;
+  }
+
+  function keepVolumePopupOpen(){
+    clearTimeout(volumePopupTimer);
+    volumePopupTimer = setTimeout(closeVolumePopup, 4000);
+  }
+
+  function openVolumePopup(){
+    volumePopup.classList.add('show');
+    soundBtn.setAttribute('aria-expanded', 'true');
+    soundControl.classList.add('popup-open');
+    keepVolumePopupOpen();
+  }
+
+  function closeVolumePopup(){
+    clearTimeout(volumePopupTimer);
+    volumePopup.classList.remove('show');
+    soundBtn.setAttribute('aria-expanded', 'false');
+    soundControl.classList.remove('popup-open');
+  }
+
+  function toggleVolumePopup(){
+    if (volumePopup.classList.contains('show')) closeVolumePopup();
+    else openVolumePopup();
+  }
+
+  // إغلاق المربع لو المستخدم ضغط في مكان تاني بره منطقة الصوت
+  document.addEventListener('pointerdown', (e) => {
+    if (!volumePopup.classList.contains('show')) return;
+    if (e.target.closest('.sound-control')) return;
+    closeVolumePopup();
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    volume = Number(volumeSlider.value) / 100;
+    volumeLbl.textContent = toEastern(volumeSlider.value) + '٪';
+    keepVolumePopupOpen();
+  });
+
+  volumeSlider.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    ensureAudioCtx();
+    keepVolumePopupOpen();
+  });
+
+  function ensureAudioCtx(){
+    if (!audioCtx){
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 1;
+        const comp = audioCtx.createDynamicsCompressor();
+        comp.threshold.value = -18;
+        comp.knee.value = 12;
+        comp.ratio.value = 6;
+        comp.attack.value = 0.002;
+        comp.release.value = 0.15;
+        masterGain.connect(comp).connect(audioCtx.destination);
+      }
+      catch(e){ audioCtx = null; masterGain = null; }
+    }
+    if (audioCtx && audioCtx.state === 'suspended'){
+      audioCtx.resume().catch(() => {});
+    }
+    return audioCtx;
+  }
+
+  let noiseBuffer = null;
+  function getNoiseBuffer(ctx){
+    if (!noiseBuffer){
+      const size = Math.floor(ctx.sampleRate * 0.05);
+      noiseBuffer = ctx.createBuffer(1, size, ctx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < size; i++){
+        // تلاشي سريع عشان تبقى طقة قصيرة مش ضجيج ممتد
+        const decay = 1 - (i / size);
+        data[i] = (Math.random() * 2 - 1) * decay;
+      }
+    }
+    return noiseBuffer;
+  }
+
+  function playTapSound(){
+    if (muted) return;
+    const ctx = ensureAudioCtx();
+    if (!ctx || !masterGain) return;
+    const now = ctx.currentTime;
+    const lvl = volumeLevel();
+
+    // جسم النقرة: نغمة خشبية دافئة منخفضة
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 900;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(190, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.045);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.6 * lvl, now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+    osc.connect(filter).connect(gain).connect(masterGain);
+    osc.onended = () => { try{ osc.disconnect(); filter.disconnect(); gain.disconnect(); }catch(e){} };
+    osc.start(now);
+    osc.stop(now + 0.12);
+
+    // طقّة احتكاك الخشب: نويز قصير جدًا مفلتر يدي واقعية "تك" حبة السبحة
+    const noise = ctx.createBufferSource();
+    noise.buffer = getNoiseBuffer(ctx);
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.value = 1500;
+    noiseFilter.Q.value = 1;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.0001, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.85 * lvl, now + 0.002);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+    noise.connect(noiseFilter).connect(noiseGain).connect(masterGain);
+    noise.onended = () => { try{ noise.disconnect(); noiseFilter.disconnect(); noiseGain.disconnect(); }catch(e){} };
+    noise.start(now);
+    noise.stop(now + 0.025);
+  }
+
+  function playBellTone(ctx, startTime, baseFreq, volume, decay){
+    // جرس رقيق متعدد التوافقيات يحاكي صوت الأجراس الهادئة
+    const partials = [1, 2.4, 3.8];
+    const partialGains = [0.55, 0.25, 0.1];
+    partials.forEach((mult, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq * mult, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(volume * partialGains[idx], startTime + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + decay - idx * 0.15);
+      osc.connect(gain).connect(masterGain || ctx.destination);
+      osc.onended = () => { try{ osc.disconnect(); gain.disconnect(); }catch(e){} };
+      osc.start(startTime);
+      osc.stop(startTime + decay + 0.05);
+    });
+  }
+
+  function playCelebrationSound(){
+    if (muted) return;
+    const ctx = ensureAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const lvl = volumeLevel();
+    // نغمتان هادئتان متتاليتان بطابع روحاني عند إتمام ٣٣
+    playBellTone(ctx, now, 587.33, 0.45 * lvl, 1.1);
+    playBellTone(ctx, now + 0.32, 783.99, 0.34 * lvl, 0.9);
+  }
+
+  function setMuted(next){
+    muted = next;
+    soundBtn.classList.toggle('muted', muted);
+    soundIconOn.style.display = muted ? 'none' : '';
+    soundIconOff.style.display = muted ? '' : 'none';
+
+    muteToggleBtn.classList.toggle('is-muted', muted);
+    muteToggleBtn.setAttribute('aria-pressed', String(muted));
+    muteIconOn.style.display = muted ? 'none' : '';
+    muteIconOff.style.display = muted ? '' : 'none';
+    muteToggleLbl.textContent = muted ? 'تشغيل الصوت' : 'كتم الصوت';
+  }
+
+  // زر الصوت الرئيسي: بيفتح/يقفل مربع التحكم فقط، ولا يكتم ولا يشغّل الصوت
+  soundBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ensureAudioCtx();
+    toggleVolumePopup();
+  });
+
+  // زر الكتم/التشغيل داخل المربع هو الوحيد المسؤول عن كتم أو تشغيل الصوت
+  muteToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ensureAudioCtx();
+    setMuted(!muted);
+    keepVolumePopupOpen();
+  });
+
+  ringEl.setAttribute('stroke-dasharray', CIRC.toFixed(2));
+
+  function render(){
+    if (unlimited){
+      countEl.textContent = toEastern(total);
+      countLabelEl.textContent = 'بدون حد';
+      const progress = total / MAX_TOTAL;
+      ringEl.setAttribute('stroke-dashoffset', (CIRC * (1 - progress)).toFixed(2));
+    } else {
+      countEl.textContent = toEastern(inRound);
+      countLabelEl.textContent = 'من ٣٣';
+      const progress = inRound / ROUND;
+      ringEl.setAttribute('stroke-dashoffset', (CIRC * (1 - progress)).toFixed(2));
+    }
+    roundsEl.textContent = toEastern(rounds);
+    totalEl.textContent = toEastern(total);
+  }
+
+  let liveTimer = null;
+  function announce(){
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(() => { liveRegion.textContent = 'العدد ' + total; }, 400);
+  }
+
+  // تجميع التحديثات البصرية في فريم واحد بدل ما نرسم مع كل نقرة على حدة —
+  // العدّ نفسه بيتحسب فورًا في tick()، ده بس بيأجل الرسم على الشاشة.
+  let renderScheduled = false;
+  function scheduleRender(){
+    if (renderScheduled) return;
+    renderScheduled = true;
+    requestAnimationFrame(() => { renderScheduled = false; render(); });
+  }
+
+  function spawnRipple(x, y){
+    const r = document.createElement('div');
+    r.className = 'ripple';
+    r.style.left = x + 'px';
+    r.style.top = y + 'px';
+    tapZone.appendChild(r);
+    let removed = false;
+    const remove = () => { if (!removed){ removed = true; r.remove(); } };
+    r.addEventListener('animationend', remove, { once:true });
+    setTimeout(remove, 400);
+  }
+
+  // حد أدنى بسيط بين المؤثرات (صوت/اهتزاز/ريبل) عشان النقر المتلاحق جدًا
+  // ما يغرقش المتصفح بمئات العقد الصوتية وعناصر الـ DOM في الثانية الواحدة.
+  // العدّ نفسه (total/inRound/rounds) بيتحسب دايمًا بدون أي تخطي أو تأخير.
+  const FX_MIN_GAP = 45;
+  let lastFxTime = 0;
+
+  // كل نقرة تُحسب فورًا داخل معالج الحدث نفسه دون أي تأخير أو انتظار
+  // لانتهاء أي حركة، لذلك النقرات المتتالية والسريعة جدًا تُحتسب كلها.
+  function tick(clientX, clientY){
+    if (total >= MAX_TOTAL){
+      if (navigator.vibrate) { try { navigator.vibrate([6,30,6,30,6]); } catch(e){} }
+      return;
+    }
+    total += 1;
+    const now = performance.now();
+    const allowFx = (now - lastFxTime) >= FX_MIN_GAP;
+    let completedRound = false;
+    if (unlimited){
+      if (total % ROUND === 0){ rounds += 1; completedRound = true; }
+    } else {
+      inRound += 1;
+      if (inRound >= ROUND){ inRound = 0; rounds += 1; completedRound = true; }
+    }
+
+    if (completedRound){
+      // إتمام الدورة إحساس مهم، بيتنفذ دايمًا مهما كان النقر سريع.
+      lastFxTime = now;
+      if (navigator.vibrate) { try { navigator.vibrate([12, 40, 12]); } catch(e){} }
+      playCelebrationSound();
+    } else if (allowFx){
+      lastFxTime = now;
+      if (navigator.vibrate) { try { navigator.vibrate(9); } catch(e){} }
+      playTapSound();
+    }
+
+    scheduleRender();
+    announce();
+
+    tapZone.classList.add('tapped');
+    if (allowFx || completedRound){
+      spawnRipple(clientX - tapRect.left, clientY - tapRect.top);
+    }
+  }
+
+  tapZone.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    tick(e.clientX, e.clientY);
+  }, { passive:false });
+
+  tapZone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      tick(tapRect.left + tapRect.width/2, tapRect.top + tapRect.height/2);
+    }
+  });
+
+  modeBtn.addEventListener('click', () => {
+    unlimited = !unlimited;
+    modeBtn.classList.toggle('active', unlimited);
+    document.body.classList.toggle('unlimited-mode', unlimited);
+    modeBtn.textContent = unlimited ? 'وضع بدون حد ✓' : 'بدون حد';
+    inRound = 0;
+    render();
+  });
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const confirmBtn = document.getElementById('confirmBtn');
+  let countdownTimer = null;
+
+  function openModal(){
+    modalOverlay.classList.add('open');
+    let secondsLeft = 3;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'نعم (' + toEastern(secondsLeft) + ')';
+    countdownTimer = setInterval(() => {
+      secondsLeft -= 1;
+      if (secondsLeft <= 0){
+        clearInterval(countdownTimer);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'نعم';
+      } else {
+        confirmBtn.textContent = 'نعم (' + toEastern(secondsLeft) + ')';
+      }
+    }, 1000);
+  }
+
+  function closeModal(){
+    clearInterval(countdownTimer);
+    modalOverlay.classList.remove('open');
+  }
+
+  resetBtn.addEventListener('click', () => {
+    openModal();
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    closeModal();
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    if (confirmBtn.disabled) return;
+    syncTasbihProgress();
+    inRound = 0; rounds = 0; total = 0;
+    lastSyncedTotal = 0;
+    localStorage.setItem('tasbih_last_synced_total', '0');
+    render();
+    closeModal();
+  });
+
+  // ── مزامنة عدد الضغطات مع سيرفر البوت (لقائمة الجوائز) ────
+  async function syncTasbihProgress(hideOverride){
+    if (!myId) return null;
+    const delta = Math.max(0, total - lastSyncedTotal);
+    if (delta === 0 && hideOverride === undefined) return null;
+    try{
+      const res = await fetch(TASBIH_API_BASE + '/tasbih/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: myId, delta, hide_name: hideOverride })
+      });
+      const data = await res.json();
+      if (data && data.ok){
+        lastSyncedTotal = total;
+        localStorage.setItem('tasbih_last_synced_total', String(lastSyncedTotal));
+        hideName = data.hide_name;
+        localStorage.setItem('tasbih_hide_name', hideName ? '1' : '0');
+        if (data.name){
+          myName = data.name;
+          localStorage.setItem('tasbih_my_name', myName);
+          prizesMeName.textContent = myName;
+        }
+      }
+      return data;
+    }catch(e){ return null; }
+  }
+
+  function updateHideBtnUI(){
+    prizesHideBtn.textContent = hideName ? 'إظهار اسمي' : 'إخفاء اسمي';
+    prizesHideBtn.classList.toggle('active', hideName);
+  }
+
+  async function loadPrizesList(){
+    prizesLoading.style.display = '';
+    prizesLoading.textContent = 'جارِ التحميل...';
+    prizesList.innerHTML = '';
+    try{
+      const url = TASBIH_API_BASE + '/tasbih/leaderboard' + (myId ? ('?id=' + encodeURIComponent(myId)) : '');
+      const res = await fetch(url);
+      const data = await res.json();
+      prizesLoading.style.display = 'none';
+      if (!data || !data.ok) { prizesLoading.style.display = ''; prizesLoading.textContent = 'تعذّر تحميل القائمة'; return; }
+
+      const medals = ['🥇','🥈','🥉'];
+      data.top.forEach((entry, i) => {
+        const li = document.createElement('li');
+        li.className = 'prize-item' + (i < 3 ? ' top3' : '');
+        li.innerHTML =
+          '<span class="prize-rank">' + (medals[i] || toEastern(i + 1)) + '</span>' +
+          '<span class="prize-name">' + escapeHtml(entry.name) + '</span>' +
+          '<span class="prize-total">' + toEastern(entry.total) + '</span>';
+        prizesList.appendChild(li);
+      });
+      if (!data.top.length){
+        prizesLoading.style.display = '';
+        prizesLoading.textContent = 'لا يوجد أحد في القائمة بعد';
+      }
+
+      if (myId && data.me){
+        prizesMeTotal.textContent = toEastern(data.me.total) + ' ضغطة';
+        prizesMeRank.textContent = data.me.rank ? ('الترتيب: ' + toEastern(data.me.rank)) : 'لم تدخل الترتيب بعد';
+        hideName = data.me.hide_name;
+        localStorage.setItem('tasbih_hide_name', hideName ? '1' : '0');
+        updateHideBtnUI();
+      }
+    }catch(e){
+      prizesLoading.style.display = '';
+      prizesLoading.textContent = 'تعذّر تحميل القائمة';
+    }
+  }
+
+  function showRegisteredUI(){
+    prizesRegisterSection.style.display = 'none';
+    prizesMeSection.style.display = '';
+    prizesMeName.textContent = myName || ('مستخدم ' + myId);
+    updateHideBtnUI();
+  }
+
+  async function openPrizesModal(){
+    prizesModalOverlay.classList.add('open');
+    if (!myId){
+      prizesRegisterSection.style.display = '';
+      prizesMeSection.style.display = 'none';
+      regIdInput.focus();
+    } else {
+      showRegisteredUI();
+      await syncTasbihProgress();
+    }
+    loadPrizesList();
+  }
+
+  function closePrizesModal(){
+    prizesModalOverlay.classList.remove('open');
+  }
+
+  regSaveBtn.addEventListener('click', async () => {
+    const idVal = regIdInput.value.trim();
+    if (!/^\d+$/.test(idVal)){
+      regIdInput.style.borderColor = 'var(--neon-red)';
+      regIdInput.focus();
+      return;
+    }
+    myId = idVal;
+    localStorage.setItem('tasbih_my_id', myId);
+    showRegisteredUI();
+    await syncTasbihProgress();
+    loadPrizesList();
+  });
+
+  trophyBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeVolumePopup();
+    openPrizesModal();
+  });
+
+  closePrizesBtn.addEventListener('click', closePrizesModal);
+  prizesModalOverlay.addEventListener('click', (e) => {
+    if (e.target === prizesModalOverlay) closePrizesModal();
+  });
+
+  prizesHideBtn.addEventListener('click', async () => {
+    hideName = !hideName;
+    updateHideBtnUI();
+    await syncTasbihProgress(hideName);
+    loadPrizesList();
+  });
+
+  // مزامنة دورية في الخلفية حتى لو المستخدم مفتحش قائمة الجوائز، وعند إغلاق/تصغير الصفحة
+  setInterval(() => { syncTasbihProgress(); }, 30000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'hidden' || !myId) return;
+    const delta = Math.max(0, total - lastSyncedTotal);
+    if (delta <= 0) return;
+    try{
+      const blob = new Blob([JSON.stringify({ id: myId, delta })], { type: 'application/json' });
+      navigator.sendBeacon(TASBIH_API_BASE + '/tasbih/sync', blob);
+      lastSyncedTotal = total;
+      localStorage.setItem('tasbih_last_synced_total', String(lastSyncedTotal));
+    }catch(e){}
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
+nced_total', String(lastSyncedTotal));
+    }catch(e){}
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
