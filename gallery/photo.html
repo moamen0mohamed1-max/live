@@ -312,7 +312,7 @@
 
   <span class="eyebrow">المؤمن</span>
   <h1>معرض الخلفيات</h1>
-  <p>خلفيات دينية بجودتها الأصلية.. المسي أي خلفية لعرضها وتحميلها</p>
+  <p>خلفيات دينية بجودتها الأصلية.. المس أي خلفية لعرضها وتحميلها</p>
 
   <svg class="divider" viewBox="0 0 360 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 14C40 14 40 6 80 6C120 6 120 22 160 22" stroke="#c9a24d" stroke-opacity="0.4" stroke-width="1.2"/>
@@ -342,8 +342,8 @@
 <script>
   // ==== إعدادات المستودع: عدّل هنا لو غيّرت اسم الحساب أو الفولدر ====
   const GITHUB_OWNER = "moamen0mohamed1-max";
-  const GITHUB_REPO  = "moamen0mohamed1-max.github.io";
-  const GITHUB_PATH  = "live/gallery"; // نفس الفولدر اللي فيه ملف photo.html ده
+  const GITHUB_REPO  = "live";
+  const GITHUB_PATH  = "gallery"; // نفس الفولدر اللي فيه ملف photo.html ده
 
   const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "gif", "avif"];
 
@@ -430,6 +430,14 @@
     try{
       const res = await fetch(apiUrl, { headers: { "Accept": "application/vnd.github+json" } });
       if(!res.ok){
+        if(res.status === 403){
+          renderState(ERROR_ICON, "تعذّر تحميل المعرض", "تم الوصول لحد الطلبات المسموح مؤقتًا، جرّب تاني بعد شوية.", true);
+          return;
+        }
+        if(res.status === 404){
+          renderState(ERROR_ICON, "تعذّر تحميل المعرض", "الفولدر مش موجود بنفس الاسم في إعدادات الصفحة، تأكد من اسم المستودع والمسار.", true);
+          return;
+        }
         throw new Error(`status ${res.status}`);
       }
       const files = await res.json();
@@ -443,7 +451,7 @@
       }
       renderGrid(images);
     }catch(err){
-      renderState(ERROR_ICON, "تعذّر تحميل المعرض", "احتمال مشكلة في الاتصال أو حد الطلبات، جرّب تاني بعد شوية.", true);
+      renderState(ERROR_ICON, "تعذّر تحميل المعرض", "احتمال مشكلة في الاتصال، جرّب تاني بعد شوية.", true);
     }
   }
 
@@ -451,3 +459,4 @@
 </script>
 </body>
 </html>
+
