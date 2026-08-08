@@ -312,7 +312,7 @@
 
   <span class="eyebrow">المؤمن</span>
   <h1>معرض الخلفيات</h1>
-  <p>خلفيات دينية بجودتها الأصلية.. المسي أي خلفية لعرضها وتحميلها</p>
+  <p>خلفيات دينية بجودتها الأصلية.. المس أي خلفية لعرضها وتحميلها</p>
 
   <svg class="divider" viewBox="0 0 360 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 14C40 14 40 6 80 6C120 6 120 22 160 22" stroke="#c9a24d" stroke-opacity="0.4" stroke-width="1.2"/>
@@ -340,10 +340,11 @@
 </div>
 
 <script>
-  // ==== إعدادات المستودع: عدّل هنا لو غيّرت اسم الحساب أو الفولدر ====
+  // ==== إعدادات المستودع: عدّل هنا لو غيّرت اسم الحساب أو الفولدر أو الفرع ====
   const GITHUB_OWNER = "moamen0mohamed1-max";
-  const GITHUB_REPO  = "moamen0mohamed1-max.github.io";
-  const GITHUB_PATH  = "live/gallery"; // نفس الفولدر اللي فيه ملف photo.html ده
+  const GITHUB_REPO  = "live";
+  const GITHUB_BRANCH = "main";
+  const GITHUB_PATH  = "gallery"; // نفس الفولدر اللي فيه ملف photo.html ده
 
   const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "gif", "avif"];
 
@@ -414,36 +415,53 @@
       btn.className = "tile";
       btn.setAttribute("aria-label", `فتح ${img.name}`);
       const image = document.createElement("img");
-      image.src = img.download_url;
+      image.src = img.url;
       image.alt = img.name;
       image.loading = "lazy";
       btn.appendChild(image);
-      btn.addEventListener("click", () => openLightbox(img.download_url, img.name));
+      btn.addEventListener("click", () => openLightbox(img.url, img.name));
       grid.appendChild(btn);
     });
     content.replaceChildren(grid);
   }
 
+  function extractName(fullPath){
+    const parts = fullPath.split("/");
+    return parts[parts.length - 1];
+  }
+
   async function loadGallery(){
     renderSkeleton();
-    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
+    // بيستخدم jsDelivr (بيعكس نفس المستودع) بدل GitHub API مباشرة، لأن GitHub API
+    // بيحدد الطلبات بالـ IP وده بيسبب مشاكل على شبكات المحمول (IP مشترك بين ناس كتير)،
+    // أما jsDelivr فمالوش حد طلبات خالص وأسرع في عرض الصور.
+    const listUrl = `https://data.jsdelivr.com/v1/package/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/flat`;
     try{
-      const res = await fetch(apiUrl, { headers: { "Accept": "application/vnd.github+json" } });
+      const res = await fetch(listUrl);
       if(!res.ok){
+        if(res.status === 404){
+          renderState(ERROR_ICON, "تعذّر تحميل المعرض", "اسم المستودع أو الفرع مش مظبوط في إعدادات الصفحة.", true);
+          return;
+        }
         throw new Error(`status ${res.status}`);
       }
-      const files = await res.json();
-      const images = (Array.isArray(files) ? files : [])
-        .filter((f) => f.type === "file" && IMAGE_EXTENSIONS.includes(extOf(f.name)))
+      const data = await res.json();
+      const prefix = `/${GITHUB_PATH}/`;
+      const images = (data.files || [])
+        .filter((f) => f.name.startsWith(prefix) && IMAGE_EXTENSIONS.includes(extOf(f.name)))
+        .map((f) => ({
+          name: extractName(f.name),
+          url: `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}${f.name}`,
+        }))
         .sort((a, b) => a.name.localeCompare(b.name, "ar"));
 
       if(images.length === 0){
-        renderState(EMPTY_ICON, "لسه مفيش خلفيات مضافة", "أي صورة تتحط في نفس هذا الفولدر هتظهر هنا تلقائيًا.", false);
+        renderState(EMPTY_ICON, "لسه مفيش خلفيات مضافة", "أي صورة تتحط في نفس هذا الفولدر هتظهر هنا تلقائيًا (ممكن تاخد دقايق قليلة تظهر أول مرة).", false);
         return;
       }
       renderGrid(images);
     }catch(err){
-      renderState(ERROR_ICON, "تعذّر تحميل المعرض", "احتمال مشكلة في الاتصال أو حد الطلبات، جرّب تاني بعد شوية.", true);
+      renderState(ERROR_ICON, "تعذّر تحميل المعرض", "احتمال مشكلة في الاتصال، جرّب تاني بعد شوية.", true);
     }
   }
 
