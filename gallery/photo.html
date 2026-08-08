@@ -352,6 +352,37 @@
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightboxImg");
   const downloadBtn = document.getElementById("downloadBtn");
+  const downloadBtnLabel = downloadBtn.innerHTML;
+
+  // التحميل المباشر بالـ href/download مش بيشتغل مع صور من دومين تاني (jsDelivr) على
+  // متصفحات موبايل كتير - بيفتح الصورة بدل ما ينزّلها. فبنجيب الصورة كـ blob ونحمّلها
+  // من رابط محلي، وده بيضمن نزولها فعليًا في قائمة التحميلات.
+  downloadBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const url = downloadBtn.dataset.url;
+    const filename = downloadBtn.dataset.filename || "خلفية.jpg";
+    if(!url) return;
+    downloadBtn.style.pointerEvents = "none";
+    downloadBtn.innerHTML = "جارٍ التحميل...";
+    try{
+      const res = await fetch(url);
+      if(!res.ok) throw new Error(`status ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const tempLink = document.createElement("a");
+      tempLink.href = blobUrl;
+      tempLink.download = filename;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      tempLink.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+    }catch(err){
+      window.open(url, "_blank");
+    }finally{
+      downloadBtn.style.pointerEvents = "";
+      downloadBtn.innerHTML = downloadBtnLabel;
+    }
+  });
   const closeBtn = document.getElementById("closeBtn");
 
   function renderSkeleton(){
@@ -391,8 +422,9 @@
   function openLightbox(url, name){
     lightboxImg.src = url;
     lightboxImg.alt = name;
-    downloadBtn.href = url;
-    downloadBtn.setAttribute("download", name);
+    downloadBtn.href = url; // احتياطي لو الـ JS فشل - على الأقل تفتح الصورة
+    downloadBtn.dataset.url = url;
+    downloadBtn.dataset.filename = name;
     lightbox.classList.add("open");
     document.body.style.overflow = "hidden";
   }
