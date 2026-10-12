@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<script src="https://telegram.org/js/telegram-web-app.js?64"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>المؤمن | إذاعة القرآن الكريم من القاهرة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -345,6 +346,29 @@
     navigator.mediaSession.setActionHandler('pause', ()=> stop());
     navigator.mediaSession.setActionHandler('stop',  ()=> stop());
   }
+  // ---- Telegram Mini App integration (safe no-op outside Telegram) ----
+  (function(){
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if(!tg) return;
+    try{ tg.ready(); }catch(e){}
+    try{ tg.expand(); }catch(e){}
+    try{
+      if(tg.isVersionAtLeast('6.1')){
+        tg.setHeaderColor('#1a0705');
+        tg.setBackgroundColor('#1a0705');
+      }
+      if(tg.isVersionAtLeast('7.10')) tg.setBottomBarColor('#0d0302');
+    }catch(e){}
+    // open t.me links natively instead of a new browser tab
+    if(tg.initData){
+      document.querySelectorAll('a[href^="https://t.me/"]').forEach(a=>{
+        a.addEventListener('click', ev=>{
+          ev.preventDefault();
+          try{ tg.openTelegramLink(a.href); }catch(e){ window.open(a.href, '_blank'); }
+        });
+      });
+    }
+  })();
 </script>
 </body>
 </html>
