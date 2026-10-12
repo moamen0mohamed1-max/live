@@ -54,7 +54,7 @@
   }
 
   .brand{
-    position:fixed; top:44px; right:24px; z-index:6;
+    position:fixed; top:44px; right:24px; z-index:6; cursor:pointer; padding:8px;
     font-family:'Aref Ruqaa', serif; font-size:1.3rem; color:var(--gold-bright);
     display:flex; align-items:center; gap:8px;
   }
@@ -209,7 +209,7 @@
     </a>
 
     <div class="divider"></div>
-    <footer>المؤمن — رفيقك في رحلة القرآن</footer>
+    <footer>المؤمن — رفيقك في رحلة القرآن <span style="opacity:.4">· v4</span></footer>
   </div>
 
   <div class="skyline">
@@ -259,6 +259,33 @@
   let retries = 0;
   let retryTimer = null;
   let barsTimer = null;
+  let connected = false;     // true only after the stream actually started playing
+
+  // ---- debug log: open the Mini App with ?startapp=debug (or ?debug in a browser) ----
+  const tgApp = window.Telegram && window.Telegram.WebApp;
+  let DEBUG = /[?&#]debug/.test(location.href) ||
+                !!(tgApp && tgApp.initDataUnsafe && tgApp.initDataUnsafe.start_param === 'debug');
+  let dbgEl = null;
+  const VERSION = 'v4';
+  (function(){
+    const brand = document.querySelector('.brand');
+    let taps = 0, t0 = 0;
+    if(brand) brand.addEventListener('click', ()=>{
+      const now = Date.now();
+      taps = (now - t0 > 2500) ? 1 : taps + 1; t0 = now;
+      if(taps >= 5){ taps = 0; DEBUG = true; log('debug on, ' + VERSION + ', ' + navigator.userAgent); }
+    });
+  })();
+  function log(msg){
+    if(!DEBUG) return;
+    if(!dbgEl){
+      dbgEl = document.createElement('pre');
+      dbgEl.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;margin:0;padding:6px 8px;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.35 monospace;z-index:99;direction:ltr;text-align:left;white-space:pre-wrap';
+      document.body.appendChild(dbgEl);
+    }
+    dbgEl.textContent += new Date().toISOString().slice(14,23) + ' ' + msg + '\n';
+    dbgEl.scrollTop = dbgEl.scrollHeight;
+  }
 
   function randomizeBars(){
     barEls.forEach(bar=>{ bar.style.height = (5 + Math.random() * 20) + 'px'; });
@@ -286,6 +313,8 @@
 
   function connect(){
     clearTimeout(retryTimer);
+    connected = false;
+    log('connect()');
     // reload so we always join the live edge, not stale buffered audio
     audio.src = STREAM_URL;
     audio.load();
@@ -295,7 +324,7 @@
   function handleFailure(){
     if(!wantPlay) return;
     if(retries >= MAX_RETRIES){
-      stop('تعذر الاتصال بالبث، حاول مجددًا لاحقًا');
+      stop('تعذر الاتصال بالبث، حاول مجددًا لاحقًا', 'retries-exhausted');
       return;
     }
     retries++;
@@ -311,7 +340,8 @@
     connect();
   }
 
-  function stop(msg){
+  function stop(msg, why){
+    log('stop() by ' + (why || 'unknown'));
     wantPlay = false;
     clearTimeout(retryTimer);
     audio.pause();
@@ -320,20 +350,25 @@
     setUI('idle', msg || 'تم الإيقاف');
   }
 
-  btn.addEventListener('click', ()=> wantPlay ? stop() : start());
+  btn.addEventListener('click', ()=>{ log('click wantPlay=' + wantPlay); wantPlay ? stop(undefined, 'user-click') : start(); });
 
   audio.addEventListener('playing', ()=>{
     retries = 0;
+    connected = true;
     setUI('playing', 'يُبث الآن مباشرة');
   });
   audio.addEventListener('waiting', ()=>{ if(wantPlay) setUI('loading', 'جاري التحميل...'); });
   audio.addEventListener('stalled', ()=>{ if(wantPlay) setUI('loading', 'ضعف في الاتصال...'); });
-  audio.addEventListener('error',   handleFailure);
+  audio.addEventListener('error',   ()=>{ log('event error code=' + (audio.error && audio.error.code) + ' msg=' + (audio.error && audio.error.message)); handleFailure(); });
   audio.addEventListener('ended',   handleFailure);   // a live stream should never end
   // paused from outside the page (headphones unplugged, call, system controls)
   audio.addEventListener('pause', ()=>{
-    if(wantPlay && audio.getAttribute('src')) stop();
+    log('event pause connected=' + connected);
+    if(wantPlay && connected && !audio.ended) stop(undefined, 'external-pause');
   });
+
+  ['loadstart','loadedmetadata','canplay','play','waiting','stalled','suspend','abort','emptied','ended']
+    .forEach(ev => audio.addEventListener(ev, ()=> log('event ' + ev + ' ready=' + audio.readyState + ' net=' + audio.networkState)));
 
   // lock-screen / notification controls
   if('mediaSession' in navigator){
@@ -343,8 +378,8 @@
       album: 'المؤمن'
     });
     navigator.mediaSession.setActionHandler('play',  start);
-    navigator.mediaSession.setActionHandler('pause', ()=> stop());
-    navigator.mediaSession.setActionHandler('stop',  ()=> stop());
+    navigator.mediaSession.setActionHandler('pause', ()=> stop(undefined, 'mediasession-pause'));
+    navigator.mediaSession.setActionHandler('stop',  ()=> stop(undefined, 'mediasession-stop'));
   }
   // ---- Telegram Mini App integration (safe no-op outside Telegram) ----
   (function(){
