@@ -24,6 +24,7 @@
   }
   body{
     min-height:100vh;
+    min-height:100dvh;
     background:
       radial-gradient(circle at 50% 8%, #521712 0%, transparent 45%),
       radial-gradient(ellipse at 50% 115%, #4a1310 0%, var(--bg-deep) 55%),
@@ -170,6 +171,9 @@
     pointer-events:none;
   }
   .skyline svg{ width:100%; height:100%; display:block; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -237,30 +241,31 @@
     </svg>
   </div>
 
-  <audio id="radio" preload="none">
-    <source src="https://stream.radiojar.com/8s5u5tpdtwzuv" type="audio/mpeg">
-  </audio>
+  <audio id="radio" preload="none"></audio>
 
 <script>
+  const STREAM_URL = 'https://stream.radiojar.com/8s5u5tpdtwzuv';
+  const MAX_RETRIES = 5;
+
   const audio = document.getElementById('radio');
   const btn = document.getElementById('playBtn');
   const iconPlay = document.getElementById('iconPlay');
   const iconPause = document.getElementById('iconPause');
   const status = document.getElementById('status');
   const barEls = document.querySelectorAll('.bars i');
-  let playing = false;
+
+  let wantPlay = false;      // user intent
+  let retries = 0;
+  let retryTimer = null;
   let barsTimer = null;
 
   function randomizeBars(){
-    barEls.forEach(bar=>{
-      const h = 5 + Math.random() * 20; // between 5px and 25px
-      bar.style.height = h + 'px';
-    });
+    barEls.forEach(bar=>{ bar.style.height = (5 + Math.random() * 20) + 'px'; });
   }
   function startBars(){
     if(barsTimer) return;
     randomizeBars();
-    barsTimer = setInterval(randomizeBars, 650); // slower, irregular feel
+    barsTimer = setInterval(randomizeBars, 650);
   }
   function stopBars(){
     clearInterval(barsTimer);
@@ -268,33 +273,78 @@
     barEls.forEach(bar=> bar.style.height = '6px');
   }
 
-  btn.addEventListener('click', () => {
-    if(!playing){
-      status.textContent = 'جاري الاتصال بالبث...';
-      audio.play().then(()=>{
-        playing = true;
-        document.body.classList.add('playing');
-        iconPlay.style.display='none';
-        iconPause.style.display='block';
-        status.textContent = 'يُبث الآن مباشرة';
-        startBars();
-      }).catch(()=>{
-        status.textContent = 'تعذر تشغيل البث، حاول مجددًا';
-      });
-    } else {
-      audio.pause();
-      playing = false;
-      document.body.classList.remove('playing');
-      iconPlay.style.display='block';
-      iconPause.style.display='none';
-      status.textContent = 'تم الإيقاف';
-      stopBars();
+  function setUI(state, msg){
+    const on = (state === 'playing' || state === 'loading');
+    document.body.classList.toggle('playing', state === 'playing');
+    iconPlay.style.display  = on ? 'none'  : 'block';
+    iconPause.style.display = on ? 'block' : 'none';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if(state === 'playing') startBars(); else stopBars();
+    status.textContent = msg || '';
+  }
+
+  function connect(){
+    clearTimeout(retryTimer);
+    // reload so we always join the live edge, not stale buffered audio
+    audio.src = STREAM_URL;
+    audio.load();
+    audio.play().catch(()=>{ handleFailure(); });
+  }
+
+  function handleFailure(){
+    if(!wantPlay) return;
+    if(retries >= MAX_RETRIES){
+      stop('تعذر الاتصال بالبث، حاول مجددًا لاحقًا');
+      return;
     }
+    retries++;
+    setUI('loading', 'انقطع البث، جاري إعادة الاتصال...');
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(connect, Math.min(2000 * retries, 10000));
+  }
+
+  function start(){
+    wantPlay = true;
+    retries = 0;
+    setUI('loading', 'جاري الاتصال بالبث...');
+    connect();
+  }
+
+  function stop(msg){
+    wantPlay = false;
+    clearTimeout(retryTimer);
+    audio.pause();
+    audio.removeAttribute('src');   // closes the connection (saves data)
+    audio.load();
+    setUI('idle', msg || 'تم الإيقاف');
+  }
+
+  btn.addEventListener('click', ()=> wantPlay ? stop() : start());
+
+  audio.addEventListener('playing', ()=>{
+    retries = 0;
+    setUI('playing', 'يُبث الآن مباشرة');
+  });
+  audio.addEventListener('waiting', ()=>{ if(wantPlay) setUI('loading', 'جاري التحميل...'); });
+  audio.addEventListener('stalled', ()=>{ if(wantPlay) setUI('loading', 'ضعف في الاتصال...'); });
+  audio.addEventListener('error',   handleFailure);
+  audio.addEventListener('ended',   handleFailure);   // a live stream should never end
+  // paused from outside the page (headphones unplugged, call, system controls)
+  audio.addEventListener('pause', ()=>{
+    if(wantPlay && audio.getAttribute('src')) stop();
   });
 
-  audio.addEventListener('waiting', ()=> status.textContent='جاري التحميل...');
-  audio.addEventListener('playing', ()=> status.textContent='يُبث الآن مباشرة');
-  audio.addEventListener('error', ()=> status.textContent='حدث خطأ في الاتصال بالإذاعة');
+  // lock-screen / notification controls
+  if('mediaSession' in navigator){
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'إذاعة القرآن الكريم',
+      artist: 'القاهرة — بث مباشر',
+      album: 'المؤمن'
+    });
+    navigator.mediaSession.setActionHandler('play',  start);
+    navigator.mediaSession.setActionHandler('pause', ()=> stop());
+    navigator.mediaSession.setActionHandler('stop',  ()=> stop());
+  }
 </script>
 </body>
 </html>
