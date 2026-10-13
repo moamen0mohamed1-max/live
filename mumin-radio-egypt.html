@@ -57,7 +57,7 @@
   }
 
   .brand{
-    position:fixed; top:44px; right:24px; z-index:6; cursor:pointer; padding:8px;
+    position:absolute; top:44px; right:24px; z-index:6; cursor:pointer; padding:8px;
     font-family:'Aref Ruqaa', serif; font-size:1.5rem; color:var(--gold-bright);
     display:flex; align-items:center; gap:10px;
   }
@@ -251,11 +251,13 @@
 
 <script>
   // نفس المحطة (radiojar) بأكثر من مدخل. لو واحد فشل في WebView تيليجرام نجرّب اللي بعده.
-  const STREAMS = [
+  // لو عملت proxy على سيرفرك/Worker حط رابطه هنا وهيتجرّب الأول (سيبه فاضي لو مفيش)
+  const PROXY_URL = 'https://moamen.wisp.uno/stream';
+  const STREAMS = (PROXY_URL ? [PROXY_URL] : []).concat([
     'https://stream.radiojar.com/8s5u5tpdtwzuv',
     'https://n12.radiojar.com/8s5u5tpdtwzuv',
     'https://n12.radiojar.com/8s5u5tpdtwzuv?rj-ttl=5'
-  ];
+  ]);
   let streamIdx = 0;
   const MAX_RETRIES = STREAMS.length * 2;   // لفّتين على كل المداخل
 
@@ -381,7 +383,8 @@
         if(a === audio && !ac.signal.aborted){ log('mse stream ended'); handleFailure(); }
       }catch(e){
         if(ac.signal.aborted || a !== audio) return;
-        log('mse fetch failed: ' + e.name + ' ' + e.message + ' (CORS لو TypeError)');
+        log('mse fetch failed: ' + e.name + ' ' + e.message);
+        if(e.name === 'TypeError') retries = MAX_RETRIES;   // فشل شبكة من جوه الـ WebView: التكرار مش هيفرق
         handleFailure();
       }
     }, {once:true});
@@ -439,13 +442,13 @@
       log('probe cors: HTTP ' + r.status + ' type=' + r.headers.get('content-type') + ' final=' + r.url);
       ac.abort();
     }catch(e){
-      log('probe cors failed: ' + e.name + ' (غالبًا CORS، مش دليل على عطل)');
+      log('probe cors failed: ' + e.name);
       try{
         const ac2 = new AbortController();
         await fetch(url, {mode:'no-cors', cache:'no-store', referrerPolicy:'no-referrer', signal:ac2.signal});
-        log('probe no-cors: الشبكة وصلت للسيرفر');
+        log('probe no-cors: ok (يعني المشكلة CORS بس)');
         ac2.abort();
-      }catch(e2){ log('probe no-cors failed: ' + e2.name + ' — السيرفر مش واصل من الشبكة دي'); }
+      }catch(e2){ log('probe no-cors failed: ' + e2.name + ' (مش CORS: الطلب نفسه بيفشل جوه الـ WebView)'); }
     }
   }
 
