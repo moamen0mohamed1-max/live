@@ -214,7 +214,7 @@
     </a>
 
     <div class="divider"></div>
-    <footer>ملاذ — رفيقك في رحلة القرآن <span style="opacity:.4">· v5</span></footer>
+    <footer>ملاذ — رفيقك في رحلة القرآن <span style="opacity:.4">· v6</span></footer>
   </div>
 
   <div class="skyline">
@@ -247,37 +247,46 @@
     </svg>
   </div>
 
-  <audio id="radio" preload="none"></audio>
+  <audio id="radio" preload="none" playsinline webkit-playsinline></audio>
 
 <script>
-  // نفس المحطة (radiojar) بأكثر من مدخل. لو واحد فشل في WebView تيليجرام نجرّب اللي بعده.
-  const STREAMS = [
+  // الإذاعة بتعدّي من بوابة السيرفر بتاعك (webhook_gateway.py) فمفيش اعتماد على وصول الموبايل لـ radiojar.
+  // لو البوابة وقعت أو زحمة (503) بيجرّب الروابط المباشرة تلقائيًا. فاضي = الروابط المباشرة بس.
+  const PROXY_URL = 'https://moamen.wispbyte.app/radio/stream';
+
+  const DIRECT_STREAMS = [
     'https://stream.radiojar.com/8s5u5tpdtwzuv',
     'https://n12.radiojar.com/8s5u5tpdtwzuv',
     'https://n12.radiojar.com/8s5u5tpdtwzuv?rj-ttl=5'
   ];
-  let streamIdx = 0;
-  const MAX_RETRIES = STREAMS.length * 2;   // لفّتين على كل المداخل
+  const STREAMS = (PROXY_URL ? [PROXY_URL] : []).concat(DIRECT_STREAMS);
+  const MAX_RETRIES     = STREAMS.length * 2;   // لفّتين على كل المداخل
+  const CONNECT_TIMEOUT = 12000;                // لو ما بدأش يشتغل خلال 12 ثانية = فشل (الحجب غالبًا بيعلّق بدون error)
+  const STALL_TIMEOUT   = 15000;                // لو وقف أثناء التشغيل أكتر من 15 ثانية = أعد الاتصال
+  const VERSION = 'v6';
 
-  let audio = document.getElementById('radio');
+  // عنصر الصوت ثابت في الـ DOM: تفويض التشغيل (user gesture) بيفضل مرتبط بيه في كل المحاولات
+  const audio = document.getElementById('radio');
   const btn = document.getElementById('playBtn');
   const iconPlay = document.getElementById('iconPlay');
   const iconPause = document.getElementById('iconPause');
   const status = document.getElementById('status');
   const barEls = document.querySelectorAll('.bars i');
 
-  let wantPlay = false;      // user intent
+  let streamIdx = 0;
+  let goodIdx = 0;           // آخر مدخل اشتغل فعلًا
+  let wantPlay = false;      // نية المستخدم
   let retries = 0;
   let retryTimer = null;
+  let watchdog = null;
   let barsTimer = null;
-  let connected = false;     // true only after the stream actually started playing
+  let connected = false;     // true بعد ما البث يبدأ فعلًا
 
-  // ---- debug log: open the Mini App with ?startapp=debug (or ?debug in a browser) ----
+  // ---- debug log: افتح الـ Mini App بـ ?startapp=debug أو اضغط على الشعار 5 مرات ----
   const tgApp = window.Telegram && window.Telegram.WebApp;
   let DEBUG = /[?&#]debug/.test(location.href) ||
-                !!(tgApp && tgApp.initDataUnsafe && tgApp.initDataUnsafe.start_param === 'debug');
+              !!(tgApp && tgApp.initDataUnsafe && tgApp.initDataUnsafe.start_param === 'debug');
   let dbgEl = null;
-  const VERSION = 'v5';
   (function(){
     const brand = document.querySelector('.brand');
     let taps = 0, t0 = 0;
@@ -298,19 +307,9 @@
     dbgEl.scrollTop = dbgEl.scrollHeight;
   }
 
-  function randomizeBars(){
-    barEls.forEach(bar=>{ bar.style.height = (5 + Math.random() * 20) + 'px'; });
-  }
-  function startBars(){
-    if(barsTimer) return;
-    randomizeBars();
-    barsTimer = setInterval(randomizeBars, 650);
-  }
-  function stopBars(){
-    clearInterval(barsTimer);
-    barsTimer = null;
-    barEls.forEach(bar=> bar.style.height = '6px');
-  }
+  function randomizeBars(){ barEls.forEach(bar=>{ bar.style.height = (5 + Math.random() * 20) + 'px'; }); }
+  function startBars(){ if(barsTimer) return; randomizeBars(); barsTimer = setInterval(randomizeBars, 650); }
+  function stopBars(){ clearInterval(barsTimer); barsTimer = null; barEls.forEach(bar=> bar.style.height = '6px'); }
 
   function setUI(state, msg){
     const on = (state === 'playing' || state === 'loading');
@@ -320,161 +319,96 @@
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     if(state === 'playing') startBars(); else stopBars();
     status.textContent = msg || '';
+    try{ if('mediaSession' in navigator) navigator.mediaSession.playbackState = (state === 'playing') ? 'playing' : 'paused'; }catch(e){}
   }
 
-  // ---- مسار بديل: نجيب البث بـ fetch ونغذّي به MediaSource (لو عنصر audio رفض الرابط مباشرة) ----
-  let useMse = false, triedMse = false, mseAbort = null, mseUrl = null;
-  function cleanupMse(){
-    if(mseAbort){ try{ mseAbort.abort(); }catch(e){} mseAbort = null; }
-    if(mseUrl){ try{ URL.revokeObjectURL(mseUrl); }catch(e){} mseUrl = null; }
+  // ---- watchdog: بعض الشبكات بتعلّق الاتصال بدون ما تطلع error ----
+  function armWatchdog(ms, why){
+    clearTimeout(watchdog);
+    watchdog = setTimeout(()=>{ if(wantPlay){ log('watchdog: ' + why); handleFailure(); } }, ms);
   }
+  function clearWatchdog(){ clearTimeout(watchdog); watchdog = null; }
 
-  function connectMse(base){
-    const a = audio;
-    const ac = new AbortController();
-    mseAbort = ac;
-    const ms = new MediaSource();
-    mseUrl = URL.createObjectURL(ms);
-    a.src = mseUrl;
-    ms.addEventListener('sourceopen', async ()=>{
-      if(a !== audio || ac.signal.aborted) return;
-      let sb;
-      try{
-        sb = ms.addSourceBuffer('audio/mpeg');
-        sb.mode = 'sequence';
-      }catch(e){ log('mse addSourceBuffer failed: ' + e.name); return handleFailure(); }
+  const ERR_NAMES = {1:'ABORTED', 2:'NETWORK', 3:'DECODE', 4:'SRC_NOT_SUPPORTED'};
 
-      const queue = [];
-      const trim = ()=>{
-        try{
-          if(!sb.updating && sb.buffered.length && a.currentTime > 40){
-            sb.remove(0, a.currentTime - 20);   // نحتفظ بآخر ~20 ثانية بس عشان الذاكرة
-            return true;
-          }
-        }catch(e){}
-        return false;
-      };
-      const pump = ()=>{
-        if(sb.updating || !queue.length || ms.readyState !== 'open') return;
-        const chunk = queue.shift();
-        try{ sb.appendBuffer(chunk); }
-        catch(e){
-          if(e.name === 'QuotaExceededError'){ queue.unshift(chunk); trim(); }
-          else { log('mse append failed: ' + e.name); handleFailure(); }
-        }
-      };
-      sb.addEventListener('updateend', ()=>{ if(a !== audio) return; if(!trim()) pump(); });
-
-      try{
-        const r = await fetch(base, {cache:'no-store', referrerPolicy:'no-referrer', signal:ac.signal});
-        if(!r.ok || !r.body) throw new Error('HTTP ' + r.status);
-        log('mse fetch ok type=' + r.headers.get('content-type'));
-        const reader = r.body.getReader();
-        while(true){
-          const {done, value} = await reader.read();
-          if(done) break;
-          if(a !== audio || ac.signal.aborted) return;
-          queue.push(value);
-          if(queue.length > 300) queue.splice(0, queue.length - 150);   // حماية من تراكم لو الجهاز بطيء
-          pump();
-        }
-        if(a === audio && !ac.signal.aborted){ log('mse stream ended'); handleFailure(); }
-      }catch(e){
-        if(ac.signal.aborted || a !== audio) return;
-        log('mse fetch failed: ' + e.name + ' ' + e.message + ' (CORS لو TypeError)');
-        handleFailure();
-      }
-    }, {once:true});
-  }
-
-  function makeAudio(){
-    cleanupMse();
-    // عنصر audio جديد في كل محاولة: بعد MEDIA_ELEMENT_ERROR بعض الـ WebViews بيفضل عنصر الصوت في حالة بايظة
-    if(audio){
-      const old = audio;
-      audio = null;                 // أحداث العنصر القديم تتجاهل نفسها
-      try{ old.pause(); old.removeAttribute('src'); old.load(); old.remove(); }catch(e){}
-    }
-    const a = document.createElement('audio');
-    a.id = 'radio';
-    a.preload = 'none';
-    a.setAttribute('playsinline', '');
-    document.body.appendChild(a);
-    audio = a;
-    bind(a);
-  }
-
-  function bind(a){
-    const mine = fn => (...args) => { if(a === audio) fn(...args); };
-    a.addEventListener('playing', mine(()=>{
+  function bind(){
+    audio.addEventListener('playing', ()=>{
+      if(!wantPlay) return;
       retries = 0;
       connected = true;
+      goodIdx = streamIdx % STREAMS.length;
+      clearWatchdog();
       clearFallback();
       setUI('playing', 'يُبث الآن مباشرة');
-    }));
-    a.addEventListener('waiting', mine(()=>{ if(wantPlay) setUI('loading', 'جاري التحميل...'); }));
-    a.addEventListener('stalled', mine(()=>{ if(wantPlay) setUI('loading', 'ضعف في الاتصال...'); }));
-    a.addEventListener('error',   mine(()=>{
-      const e = a.error;
-      log('event error code=' + (e && e.code) + ' msg=' + (e && e.message) + ' url=' + a.currentSrc);
+    });
+    audio.addEventListener('waiting', ()=>{
+      if(!wantPlay) return;
+      setUI('loading', 'جاري التحميل...');
+      if(connected) armWatchdog(STALL_TIMEOUT, 'stalled while playing');
+    });
+    audio.addEventListener('stalled', ()=>{ if(wantPlay) setUI('loading', 'ضعف في الاتصال...'); });
+    audio.addEventListener('error', ()=>{
+      if(!wantPlay) return;
+      const e = audio.error;
+      log('event error ' + (e ? (ERR_NAMES[e.code] || e.code) : '?') + ' msg=' + (e && e.message) + ' url=' + audio.currentSrc);
       handleFailure();
-    }));
-    a.addEventListener('ended', mine(handleFailure));   // البث المباشر مفروض ما يخلصش
+    });
+    audio.addEventListener('ended', ()=>{ if(wantPlay) handleFailure(); });   // البث المباشر مفروض ما يخلصش
     // إيقاف من برّه الصفحة (سماعات اتشالت، مكالمة، أزرار النظام)
-    a.addEventListener('pause', mine(()=>{
+    audio.addEventListener('pause', ()=>{
       log('event pause connected=' + connected);
-      if(wantPlay && connected && !a.ended) stop(undefined, 'external-pause');
-    }));
-    ['loadstart','loadedmetadata','canplay','play','waiting','stalled','suspend','abort','emptied']
-      .forEach(ev => a.addEventListener(ev, mine(()=> log('event ' + ev + ' ready=' + a.readyState + ' net=' + a.networkState))));
+      if(wantPlay && connected && !audio.ended) stop(undefined, 'external-pause');
+    });
+    ['loadstart','loadedmetadata','canplay','play','suspend','abort','emptied']
+      .forEach(ev => audio.addEventListener(ev, ()=> log('event ' + ev + ' ready=' + audio.readyState + ' net=' + audio.networkState)));
   }
+  bind();
 
+  // فحص تشخيصي فقط (في وضع debug): هل الشبكة بتوصل للسيرفر؟
   let probed = false;
   async function probe(url){
     if(probed || !DEBUG) return;
     probed = true;
+    const ac = new AbortController();
     try{
-      const ac = new AbortController();
       const r = await fetch(url, {mode:'cors', cache:'no-store', referrerPolicy:'no-referrer', signal:ac.signal});
-      log('probe cors: HTTP ' + r.status + ' type=' + r.headers.get('content-type') + ' final=' + r.url);
-      ac.abort();
+      log('probe cors: HTTP ' + r.status + ' type=' + r.headers.get('content-type'));
     }catch(e){
       log('probe cors failed: ' + e.name + ' (غالبًا CORS، مش دليل على عطل)');
       try{
-        const ac2 = new AbortController();
-        await fetch(url, {mode:'no-cors', cache:'no-store', referrerPolicy:'no-referrer', signal:ac2.signal});
+        await fetch(url, {mode:'no-cors', cache:'no-store', referrerPolicy:'no-referrer', signal:ac.signal});
         log('probe no-cors: الشبكة وصلت للسيرفر');
-        ac2.abort();
       }catch(e2){ log('probe no-cors failed: ' + e2.name + ' — السيرفر مش واصل من الشبكة دي'); }
-    }
+    }finally{ try{ ac.abort(); }catch(_){} }
   }
 
   function connect(){
     clearTimeout(retryTimer);
     retryTimer = null;
     connected = false;
-    makeAudio();
-    const base = STREAMS[streamIdx % STREAMS.length];
-    const url = base;
-    log('connect() #' + streamIdx + ' ' + base);
-    probe(base);
-    if(useMse){ connectMse(url); }
-    else { audio.src = url; audio.load(); }
+    const url = STREAMS[streamIdx % STREAMS.length];
+    log('connect() #' + streamIdx + ' ' + url);
+    probe(url);
+    armWatchdog(CONNECT_TIMEOUT, 'connect timeout');
+    audio.src = url;      // نفس العنصر دايمًا؛ تغيير src + load() بيصفّر حالته
+    audio.load();
     const p = audio.play();
     if(p && p.catch) p.catch(err=>{
+      if(!wantPlay) return;
       log('play() rejected: ' + (err && err.name));
-      if(err && err.name === 'AbortError') return;   // حصل بسبب load/stop، مش فشل حقيقي
+      if(err && err.name === 'AbortError') return;          // بسبب load/stop مش فشل حقيقي
+      if(err && err.name === 'NotAllowedError'){            // إعادة المحاولة مش هتفيد: محتاج ضغطة جديدة
+        stop('اضغط زر التشغيل مرة أخرى', 'not-allowed');
+        return;
+      }
       handleFailure();
     });
   }
 
   function handleFailure(){
     if(!wantPlay) return;
-    if(retryTimer) return;            // فشل واحد بيطلع أكتر من حدث (error + play reject): نعدّه مرة
-    if(retries >= STREAMS.length && !triedMse && window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')){
-      triedMse = true; useMse = true;
-      log('switching to MediaSource path');
-    }
+    if(retryTimer) return;            // فشل واحد بيطلع أكتر من حدث: نعدّه مرة
+    clearWatchdog();
     if(retries >= MAX_RETRIES){
       stop('تعذر تشغيل البث داخل تيليجرام', 'retries-exhausted');
       showFallback();
@@ -483,11 +417,10 @@
     retries++;
     streamIdx++;                      // جرّب المدخل التالي
     setUI('loading', 'جاري إعادة الاتصال...');
-    const delay = useMse ? 1500 : 600;
-    retryTimer = setTimeout(connect, delay);
+    retryTimer = setTimeout(connect, 600 + Math.min(retries, 5) * 300);
   }
 
-  // آخر حل: فتح الصفحة في متصفح الجهاز لو WebView تيليجرام رفض كل المداخل
+  // آخر حل: فتح البث في متصفح الجهاز لو WebView تيليجرام رفض كل المداخل
   let fbEl = null;
   function showFallback(){
     if(fbEl) return;
@@ -507,40 +440,45 @@
   function start(){
     wantPlay = true;
     retries = 0;
-    useMse = false; triedMse = false;
+    streamIdx = goodIdx;              // ابدأ بآخر مدخل اشتغل
     clearFallback();
     setUI('loading', 'جاري الاتصال بالبث...');
-    connect();
+    connect();                        // لازم يتنده مباشرة داخل ضغطة المستخدم
   }
 
   function stop(msg, why){
     log('stop() by ' + (why || 'unknown'));
     wantPlay = false;
+    connected = false;
     clearTimeout(retryTimer);
     retryTimer = null;
-    cleanupMse();
-    if(audio){
-      const a = audio;
-      audio = null;                    // يمنع أحداث pause/emptied من إعادة تشغيل منطق الفشل
-      try{ a.pause(); a.removeAttribute('src'); a.load(); a.remove(); }catch(e){}
-    }
+    clearWatchdog();
+    try{ audio.pause(); audio.removeAttribute('src'); audio.load(); }catch(e){}
     setUI('idle', msg || 'تم الإيقاف');
   }
 
   btn.addEventListener('click', ()=>{ log('click wantPlay=' + wantPlay); wantPlay ? stop(undefined, 'user-click') : start(); });
 
+  // انقطاع/رجوع النت
+  window.addEventListener('offline', ()=>{ if(wantPlay) setUI('loading', 'لا يوجد اتصال بالإنترنت...'); });
+  window.addEventListener('online', ()=>{
+    if(wantPlay && !connected){ clearTimeout(retryTimer); retryTimer = null; retries = 0; connect(); }
+  });
+
   // lock-screen / notification controls
-  if('mediaSession' in navigator){
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: 'إذاعة القرآن الكريم',
-      artist: 'القاهرة — بث مباشر',
-      album: 'ملاذ',
-      artwork: [{ src: document.querySelector('.brand-logo').src, sizes: '128x128', type: 'image/webp' }]
-    });
-    navigator.mediaSession.setActionHandler('play',  start);
-    navigator.mediaSession.setActionHandler('pause', ()=> stop(undefined, 'mediasession-pause'));
-    navigator.mediaSession.setActionHandler('stop',  ()=> stop(undefined, 'mediasession-stop'));
-  }
+  try{
+    if('mediaSession' in navigator){
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'إذاعة القرآن الكريم',
+        artist: 'القاهرة — بث مباشر',
+        album: 'ملاذ',
+        artwork: [{ src: document.querySelector('.brand-logo').src, sizes: '128x128', type: 'image/webp' }]
+      });
+      navigator.mediaSession.setActionHandler('play',  ()=>{ if(!wantPlay) start(); });
+      navigator.mediaSession.setActionHandler('pause', ()=> stop(undefined, 'mediasession-pause'));
+      navigator.mediaSession.setActionHandler('stop',  ()=> stop(undefined, 'mediasession-stop'));
+    }
+  }catch(e){ log('mediaSession setup failed: ' + e.name); }
   // ---- Telegram Mini App integration (safe no-op outside Telegram) ----
   (function(){
     const tg = window.Telegram && window.Telegram.WebApp;
