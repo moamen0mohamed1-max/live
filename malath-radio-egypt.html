@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script src="https://telegram.org/js/telegram-web-app.js?64"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ملاذ | إذاعة القرآن الكريم من القاهرة</title>
+<link rel="icon" type="image/webp" href="data:image/webp;base64,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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#070504;
+    --bg-mid:#17110a;
+    --red:#3a2a10;
+    --red-deep:#0e0a05;
+    --gold:#d4af37;
+    --gold-bright:#f3d576;
+    --gold-dim:#8a6a2c;
+    --cream:#f4e6c8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{
+    background:var(--bg-deep);
+    min-height:100%;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  body{
+    min-height:100vh;
+    min-height:100dvh;
+    background:
+      radial-gradient(circle at 50% 8%, #2a1d0c 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 115%, #22190b 0%, var(--bg-deep) 55%),
+      linear-gradient(180deg, var(--bg-deep), #030201);
+    color:var(--cream);
+    font-family:'Cairo', sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    overflow-x:clip;
+    position:relative;
+    padding:96px 16px 190px;
+  }
+
+  /* subtle hieroglyph texture drifting across background */
+  body::before{
+    content:"";
+    position:fixed; inset:-10% -10%;
+    opacity:.05;
+    background-image: radial-gradient(var(--gold) 1px, transparent 1.4px);
+    background-size: 26px 26px;
+    animation: drift 40s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes drift{
+    0%{ transform:translate(0,0); }
+    100%{ transform:translate(-26px,-26px); }
+  }
+
+  .brand{
+    position:fixed; top:44px; right:24px; z-index:6; cursor:pointer; padding:8px;
+    font-family:'Aref Ruqaa', serif; font-size:1.5rem; color:var(--gold-bright);
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-logo{ width:40px; height:40px; border-radius:50%; display:block;
+    box-shadow:0 0 0 1px rgba(212,175,55,.55), 0 4px 14px rgba(0,0,0,.6); }
+  .brand .dot{
+    width:8px; height:8px; border-radius:50%; background:#ff5b5b;
+    box-shadow:0 0 8px #ff5b5b;
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+  /* the cartouche card */
+  .cartouche{
+    position:relative; z-index:2; margin:auto 0;
+    width:min(430px, 92vw);
+    padding:44px 30px 34px;
+    border-radius:28px;
+    background:linear-gradient(180deg, #1a130a, #0b0805 70%);
+    border:1px solid rgba(212,175,55,.35);
+    box-shadow:
+      0 40px 90px rgba(0,0,0,.6),
+      inset 0 0 0 6px rgba(212,175,55,.05),
+      inset 0 0 40px rgba(212,175,55,.06);
+    text-align:center;
+  }
+  /* ornamental corners */
+  .cartouche::before, .cartouche::after,
+  .corner-bl, .corner-br{
+    content:""; position:absolute; width:26px; height:26px;
+    border:2px solid var(--gold);
+    opacity:.75;
+  }
+  .cartouche::before{ top:10px; right:10px; border-left:none; border-bottom:none; border-radius:0 8px 0 0; }
+  .cartouche::after{ top:10px; left:10px; border-right:none; border-bottom:none; border-radius:8px 0 0 0; }
+  .corner-bl{ bottom:10px; left:10px; border-right:none; border-top:none; border-radius:0 0 0 8px; }
+  .corner-br{ bottom:10px; right:10px; border-left:none; border-top:none; border-radius:0 0 8px 0; }
+
+  .live-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(212,175,55,.12);
+    border:1px solid rgba(212,175,55,.4);
+    padding:4px 14px; border-radius:999px;
+    font-size:.72rem; color:var(--gold-bright); letter-spacing:1px;
+    margin-bottom:16px;
+  }
+  .live-badge i{ width:6px; height:6px; border-radius:50%; background:#ff5b5b; box-shadow:0 0 6px #ff5b5b; animation:pulse 1.6s ease-in-out infinite; }
+
+  .eyebrow{ font-size:.8rem; letter-spacing:4px; color:var(--gold); text-transform:uppercase; }
+  h1{ font-family:'Aref Ruqaa', serif; font-size:2.3rem; margin:10px 0 6px; text-shadow:0 2px 12px rgba(212,175,55,.25); }
+  .sub{ color:#e2c9a9; opacity:.75; font-size:.9rem; margin-bottom:30px; }
+
+  /* sun-disc dial */
+  .dial-wrap{ position:relative; width:206px; height:206px; margin:0 auto 54px; }
+  .rays{
+    position:absolute; inset:0; border-radius:50%;
+    background:
+      repeating-conic-gradient(from 0deg, rgba(212,175,55,.35) 0deg 4deg, transparent 4deg 18deg);
+    -webkit-mask:radial-gradient(circle, transparent 62%, #000 64%);
+            mask:radial-gradient(circle, transparent 62%, #000 64%);
+    animation:none;
+  }
+  body.playing .rays{ animation:spin 12s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .rings{ position:absolute; inset:18px; border-radius:50%; border:1px solid rgba(212,175,55,.3); }
+  .rings::before{ content:""; position:absolute; inset:14px; border-radius:50%; border:1px solid rgba(212,175,55,.18); }
+
+  #playBtn{
+    position:absolute; inset:56px; border-radius:50%; border:none; cursor:pointer;
+    background:
+      radial-gradient(circle at 33% 28%, var(--red) 0%, var(--red-deep) 75%);
+    box-shadow:
+      0 14px 30px rgba(212,175,55,.28),
+      inset 0 2px 8px rgba(255,220,150,.25),
+      0 0 0 3px rgba(212,175,55,.5);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s ease;
+  }
+  #playBtn:active{ transform:scale(.94); }
+  #playBtn svg{ width:44px; height:44px; fill:var(--gold-bright); }
+
+  .bars{
+    position:absolute; bottom:-40px; left:50%; transform:translateX(-50%);
+    display:flex; gap:5px; align-items:flex-end; height:22px;
+  }
+  .bars i{ width:4px; background:linear-gradient(180deg, var(--gold-bright), var(--gold-dim)); border-radius:2px; height:6px; transition:height .5s ease-in-out; }
+
+  .status{ font-size:.96rem; color:var(--gold-bright); min-height:22px; margin-bottom:8px; }
+  .station-name{ font-size:1.08rem; font-weight:800; }
+  .freq{ font-size:.8rem; color:#d9b98d; margin-top:4px; opacity:.85; }
+
+  .divider{
+    margin:26px 0 18px; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(212,175,55,.55), transparent);
+  }
+  footer{ font-size:.72rem; color:#c9a679; opacity:.8; }
+
+  #telegramBtn{
+    --tg:#2AABEE; --tg-glow: rgba(42,171,238,.65);
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin:18px auto 0; width:max-content;
+    background:rgba(42,171,238,.06); border:1px solid var(--tg); color:var(--tg);
+    font-family:'Cairo', sans-serif; font-size:13px; font-weight:700;
+    padding:9px 20px; border-radius:999px; text-decoration:none;
+    text-shadow:0 0 6px var(--tg-glow), 0 0 14px var(--tg-glow);
+    box-shadow:0 0 10px rgba(42,171,238,.35), inset 0 0 10px rgba(42,171,238,.12);
+    transition: transform .15s, box-shadow .2s;
+  }
+  #telegramBtn svg{ filter:drop-shadow(0 0 5px var(--tg-glow)); }
+  #telegramBtn:active{ transform:scale(.96); }
+  #telegramBtn:focus-visible{ outline:2px solid var(--tg); outline-offset:2px; }
+
+  /* Cairo skyline silhouette fixed at bottom */
+  .skyline{
+    position:fixed; left:0; right:0; bottom:0; height:150px; z-index:1;
+    pointer-events:none;
+  }
+  .skyline svg{ width:100%; height:100%; display:block; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="brand"><img class="brand-logo" alt="ملاذ" src="data:image/webp;base64,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"><span>ملاذ</span><i class="dot"></i></div>
+
+  <div class="cartouche">
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="live-badge"><i></i> بث مباشر الآن</div>
+    <div class="eyebrow">راديو مصر</div>
+    <h1>إذاعة القرآن الكريم</h1>
+    <div class="sub">من القاهرة — بثًا مباشرًا على مدار الساعة</div>
+
+    <div class="dial-wrap">
+      <div class="rays"></div>
+      <div class="rings"></div>
+      <button id="playBtn" aria-label="تشغيل / إيقاف الإذاعة">
+        <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <div class="bars"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="status" id="status">اضغط للاستماع</div>
+    <div class="station-name">إذاعة القرآن الكريم – القاهرة</div>
+    <div class="freq">93.1 FM · بث إنترنت مباشر</div>
+
+    <a href="https://t.me/K4_X7" target="_blank" rel="noopener noreferrer" id="telegramBtn">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path fill="currentColor" d="M21.94 4.11c.26-1.13-.86-2.03-1.9-1.6L2.4 9.83c-1.03.42-1 1.91.05 2.28l4.36 1.53 1.7 5.4c.28.9 1.42 1.15 2.05.45l2.36-2.6 4.28 3.2c.9.67 2.2.18 2.44-.93L21.94 4.11zM8.53 13.1l9.4-6.02c.3-.2.6.2.34.44l-7.7 7.03a1 1 0 0 0-.3.53l-.26 1.98-.7-2.6a1 1 0 0 1 .22-1.36z"/>
+      </svg>
+      <span>تيليجرام</span>
+    </a>
+
+    <div class="divider"></div>
+    <footer>ملاذ — رفيقك في رحلة القرآن <span style="opacity:.4">· v5</span></footer>
+  </div>
+
+  <div class="skyline">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3d2c12"/>
+          <stop offset="100%" stop-color="#070504"/>
+        </linearGradient>
+      </defs>
+      <g fill="url(#skyGrad)" opacity="0.9">
+        <rect x="0" y="120" width="1200" height="80"/>
+        <path d="M120 190 L128 60 L132 60 L140 190 Z"/>
+        <ellipse cx="130" cy="55" rx="10" ry="6"/>
+        <circle cx="330" cy="118" r="34"/>
+        <rect x="300" y="118" width="60" height="72"/>
+        <rect x="255" y="70" width="10" height="120"/>
+        <circle cx="260" cy="66" r="6"/>
+        <rect x="395" y="70" width="10" height="120"/>
+        <circle cx="400" cy="66" r="6"/>
+        <path d="M560 190 L610 100 L660 190 Z"/>
+        <path d="M645 190 L680 130 L715 190 Z"/>
+        <rect x="820" y="90" width="14" height="100"/>
+        <circle cx="827" cy="84" r="7"/>
+        <circle cx="900" cy="130" r="26"/>
+        <rect x="878" y="130" width="44" height="60"/>
+        <rect x="960" y="60" width="12" height="130"/>
+        <circle cx="966" cy="55" r="6"/>
+      </g>
+    </svg>
+  </div>
+
+  <audio id="radio" preload="none"></audio>
+
+<script>
+  // نفس المحطة (radiojar) بأكثر من مدخل. لو واحد فشل في WebView تيليجرام نجرّب اللي بعده.
+  const STREAMS = [
+    'https://stream.radiojar.com/8s5u5tpdtwzuv',
+    'https://n12.radiojar.com/8s5u5tpdtwzuv',
+    'https://n12.radiojar.com/8s5u5tpdtwzuv?rj-ttl=5'
+  ];
+  let streamIdx = 0;
+  const MAX_RETRIES = STREAMS.length * 2;   // لفّتين على كل المداخل
+
+  let audio = document.getElementById('radio');
+  const btn = document.getElementById('playBtn');
+  const iconPlay = document.getElementById('iconPlay');
+  const iconPause = document.getElementById('iconPause');
+  const status = document.getElementById('status');
+  const barEls = document.querySelectorAll('.bars i');
+
+  let wantPlay = false;      // user intent
+  let retries = 0;
+  let retryTimer = null;
+  let barsTimer = null;
+  let connected = false;     // true only after the stream actually started playing
+
+  // ---- debug log: open the Mini App with ?startapp=debug (or ?debug in a browser) ----
+  const tgApp = window.Telegram && window.Telegram.WebApp;
+  let DEBUG = /[?&#]debug/.test(location.href) ||
+                !!(tgApp && tgApp.initDataUnsafe && tgApp.initDataUnsafe.start_param === 'debug');
+  let dbgEl = null;
+  const VERSION = 'v5';
+  (function(){
+    const brand = document.querySelector('.brand');
+    let taps = 0, t0 = 0;
+    if(brand) brand.addEventListener('click', ()=>{
+      const now = Date.now();
+      taps = (now - t0 > 2500) ? 1 : taps + 1; t0 = now;
+      if(taps >= 5){ taps = 0; DEBUG = true; log('debug on, ' + VERSION + ', ' + navigator.userAgent); }
+    });
+  })();
+  function log(msg){
+    if(!DEBUG) return;
+    if(!dbgEl){
+      dbgEl = document.createElement('pre');
+      dbgEl.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;margin:0;padding:6px 8px;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.35 monospace;z-index:99;direction:ltr;text-align:left;white-space:pre-wrap';
+      document.body.appendChild(dbgEl);
+    }
+    dbgEl.textContent += new Date().toISOString().slice(14,23) + ' ' + msg + '\n';
+    dbgEl.scrollTop = dbgEl.scrollHeight;
+  }
+
+  function randomizeBars(){
+    barEls.forEach(bar=>{ bar.style.height = (5 + Math.random() * 20) + 'px'; });
+  }
+  function startBars(){
+    if(barsTimer) return;
+    randomizeBars();
+    barsTimer = setInterval(randomizeBars, 650);
+  }
+  function stopBars(){
+    clearInterval(barsTimer);
+    barsTimer = null;
+    barEls.forEach(bar=> bar.style.height = '6px');
+  }
+
+  function setUI(state, msg){
+    const on = (state === 'playing' || state === 'loading');
+    document.body.classList.toggle('playing', state === 'playing');
+    iconPlay.style.display  = on ? 'none'  : 'block';
+    iconPause.style.display = on ? 'block' : 'none';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if(state === 'playing') startBars(); else stopBars();
+    status.textContent = msg || '';
+  }
+
+  function makeAudio(){
+    // عنصر audio جديد في كل محاولة: بعد MEDIA_ELEMENT_ERROR بعض الـ WebViews بيفضل عنصر الصوت في حالة بايظة
+    if(audio){
+      const old = audio;
+      audio = null;                 // أحداث العنصر القديم تتجاهل نفسها
+      try{ old.pause(); old.removeAttribute('src'); old.load(); old.remove(); }catch(e){}
+    }
+    const a = document.createElement('audio');
+    a.id = 'radio';
+    a.preload = 'none';
+    a.setAttribute('playsinline', '');
+    document.body.appendChild(a);
+    audio = a;
+    bind(a);
+  }
+
+  function bind(a){
+    const mine = fn => (...args) => { if(a === audio) fn(...args); };
+    a.addEventListener('playing', mine(()=>{
+      retries = 0;
+      connected = true;
+      clearFallback();
+      setUI('playing', 'يُبث الآن مباشرة');
+    }));
+    a.addEventListener('waiting', mine(()=>{ if(wantPlay) setUI('loading', 'جاري التحميل...'); }));
+    a.addEventListener('stalled', mine(()=>{ if(wantPlay) setUI('loading', 'ضعف في الاتصال...'); }));
+    a.addEventListener('error',   mine(()=>{
+      const e = a.error;
+      log('event error code=' + (e && e.code) + ' msg=' + (e && e.message) + ' url=' + a.currentSrc);
+      handleFailure();
+    }));
+    a.addEventListener('ended', mine(handleFailure));   // البث المباشر مفروض ما يخلصش
+    // إيقاف من برّه الصفحة (سماعات اتشالت، مكالمة، أزرار النظام)
+    a.addEventListener('pause', mine(()=>{
+      log('event pause connected=' + connected);
+      if(wantPlay && connected && !a.ended) stop(undefined, 'external-pause');
+    }));
+    ['loadstart','loadedmetadata','canplay','play','waiting','stalled','suspend','abort','emptied']
+      .forEach(ev => a.addEventListener(ev, mine(()=> log('event ' + ev + ' ready=' + a.readyState + ' net=' + a.networkState))));
+  }
+
+  function connect(){
+    clearTimeout(retryTimer);
+    retryTimer = null;
+    connected = false;
+    makeAudio();
+    const base = STREAMS[streamIdx % STREAMS.length];
+    const url = base + (base.includes('?') ? '&' : '?') + '_=' + Date.now();   // يمنع كاش/redirect قديم
+    log('connect() #' + streamIdx + ' ' + base);
+    audio.src = url;
+    audio.load();
+    const p = audio.play();
+    if(p && p.catch) p.catch(err=>{
+      log('play() rejected: ' + (err && err.name));
+      if(err && err.name === 'AbortError') return;   // حصل بسبب load/stop، مش فشل حقيقي
+      handleFailure();
+    });
+  }
+
+  function handleFailure(){
+    if(!wantPlay) return;
+    if(retryTimer) return;            // فشل واحد بيطلع أكتر من حدث (error + play reject): نعدّه مرة
+    if(retries >= MAX_RETRIES){
+      stop('تعذر تشغيل البث داخل تيليجرام', 'retries-exhausted');
+      showFallback();
+      return;
+    }
+    retries++;
+    streamIdx++;                      // جرّب المدخل التالي
+    setUI('loading', 'جاري إعادة الاتصال...');
+    const delay = (retries % STREAMS.length === 0) ? Math.min(2000 * retries, 8000) : 600;
+    retryTimer = setTimeout(connect, delay);
+  }
+
+  // آخر حل: فتح الصفحة في متصفح الجهاز لو WebView تيليجرام رفض كل المداخل
+  let fbEl = null;
+  function showFallback(){
+    if(fbEl) return;
+    fbEl = document.createElement('button');
+    fbEl.type = 'button';
+    fbEl.textContent = 'افتح في المتصفح';
+    fbEl.style.cssText = 'margin:10px auto 0;display:block;padding:10px 22px;border-radius:999px;border:1px solid #c9a24a;background:transparent;color:#e8c872;font:600 15px Cairo,sans-serif;cursor:pointer';
+    fbEl.addEventListener('click', ()=>{
+      const u = location.href.split('#')[0];
+      try{ if(tgApp && tgApp.openLink) return tgApp.openLink(u, {try_instant_view:false}); }catch(e){}
+      window.open(u, '_blank');
+    });
+    status.insertAdjacentElement('afterend', fbEl);
+  }
+  function clearFallback(){ if(fbEl){ fbEl.remove(); fbEl = null; } }
+
+  function start(){
+    wantPlay = true;
+    retries = 0;
+    clearFallback();
+    setUI('loading', 'جاري الاتصال بالبث...');
+    connect();
+  }
+
+  function stop(msg, why){
+    log('stop() by ' + (why || 'unknown'));
+    wantPlay = false;
+    clearTimeout(retryTimer);
+    retryTimer = null;
+    if(audio){
+      const a = audio;
+      audio = null;                    // يمنع أحداث pause/emptied من إعادة تشغيل منطق الفشل
+      try{ a.pause(); a.removeAttribute('src'); a.load(); a.remove(); }catch(e){}
+    }
+    setUI('idle', msg || 'تم الإيقاف');
+  }
+
+  btn.addEventListener('click', ()=>{ log('click wantPlay=' + wantPlay); wantPlay ? stop(undefined, 'user-click') : start(); });
+
+  // lock-screen / notification controls
+  if('mediaSession' in navigator){
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'إذاعة القرآن الكريم',
+      artist: 'القاهرة — بث مباشر',
+      album: 'ملاذ',
+      artwork: [{ src: document.querySelector('.brand-logo').src, sizes: '128x128', type: 'image/webp' }]
+    });
+    navigator.mediaSession.setActionHandler('play',  start);
+    navigator.mediaSession.setActionHandler('pause', ()=> stop(undefined, 'mediasession-pause'));
+    navigator.mediaSession.setActionHandler('stop',  ()=> stop(undefined, 'mediasession-stop'));
+  }
+  // ---- Telegram Mini App integration (safe no-op outside Telegram) ----
+  (function(){
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if(!tg) return;
+    try{ tg.ready(); }catch(e){}
+    try{ tg.expand(); }catch(e){}
+    try{ if(tg.isVersionAtLeast('7.7')) tg.disableVerticalSwipes(); }catch(e){}
+    try{
+      if(tg.isVersionAtLeast('6.1')){
+        tg.setHeaderColor('#070504');
+        tg.setBackgroundColor('#070504');
+      }
+      if(tg.isVersionAtLeast('7.10')) tg.setBottomBarColor('#030201');
+    }catch(e){}
+    // open t.me links natively instead of a new browser tab
+    if(tg.initData){
+      document.querySelectorAll('a[href^="https://t.me/"]').forEach(a=>{
+        a.addEventListener('click', ev=>{
+          ev.preventDefault();
+          try{ tg.openTelegramLink(a.href); }catch(e){ window.open(a.href, '_blank'); }
+        });
+      });
+    }
+  })();
+</script>
+</body>
+</html>
+
