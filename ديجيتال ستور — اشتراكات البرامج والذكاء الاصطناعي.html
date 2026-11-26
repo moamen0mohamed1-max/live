@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ديجيتال ستور — اشتراكات البرامج والذكاء الاصطناعي</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Cairo', 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      padding-bottom: 88px;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .service-card {
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+    }
+    .modal-backdrop { animation: fadeIn 0.16s ease-out; }
+    .modal-sheet { animation: slideUp 0.22s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(18px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#090d16] dark:text-slate-100 transition-colors duration-200">
+
+  <!-- Sticky Header -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-[#0d1321]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 pt-3 pb-3">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white font-black text-base shadow-lg shadow-indigo-500/25 shrink-0">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+          </div>
+          <div class="min-w-0">
+            <h1 class="text-base sm:text-lg font-black leading-tight truncate">ديجيتال ستور</h1>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight truncate">اشتراكات أصلية • ذكاء اصطناعي • برامج وتراخيص</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="serviceCountPill" class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30">
+            21 خدمة
+          </span>
+          <button
+            id="themeToggleBtn"
+            type="button"
+            aria-label="تبديل المظهر"
+            class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-700 dark:text-amber-300 hover:border-indigo-500 transition"
+          >
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+            <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div id="searchWrap" class="mt-3 relative">
+        <span class="absolute inset-y-0 right-3.5 flex items-center text-slate-400 pointer-events-none">
+          <i data-lucide="search" class="w-4 h-4"></i>
+        </span>
+        <input
+          id="searchInput"
+          type="search"
+          autocomplete="off"
+          placeholder="ابحث عن خدمة (مثال: Adobe, ChatGPT, Windows, Kaspersky)..."
+          class="w-full bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 rounded-xl pr-10 pl-9 py-2.5 text-sm placeholder-slate-400 outline-none transition"
+        />
+        <button id="clearSearchBtn" type="button" aria-label="مسح البحث" class="hidden absolute inset-y-0 left-2.5 my-auto w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Category Pills -->
+      <div id="catBarWrap" class="mt-2.5 -mx-4 px-4 overflow-x-auto no-scrollbar">
+        <div id="categoryPills" class="flex items-center gap-2 w-max pb-0.5"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 pt-4">
+
+    <!-- VIEW 1: Services Catalog -->
+    <section id="viewCatalog" aria-label="الخدمات والاشتراكات">
+
+      <!-- Hero Banner -->
+      <div class="mb-5 rounded-3xl bg-gradient-to-l from-indigo-600 via-violet-600 to-fuchsia-600 text-white p-5 sm:p-6 shadow-xl shadow-indigo-900/20 relative overflow-hidden">
+        <div class="relative z-10 flex flex-wrap items-center justify-between gap-4">
+          <div class="max-w-xl">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs border border-white/20 text-[11px] font-extrabold mb-2">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-300"></i>
+              تفعيل رسمي ومضمون طوال مدة الاشتراك
+            </div>
+            <h2 class="text-lg sm:text-2xl font-black leading-snug">كل أدوات الذكاء الاصطناعي وبرامج التصميم والأعمال في مكان واحد</h2>
+            <p class="text-xs sm:text-sm text-indigo-100 mt-1">اختر الباقة والمدة المناسبة لك وأرسل طلبك في ثوانٍ</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="heroAiBtn" type="button" class="px-4 py-2.5 rounded-xl bg-white text-indigo-700 hover:bg-indigo-50 text-xs font-black shadow-sm transition">
+              أدوات الذكاء الاصطناعي
+            </button>
+            <button id="heroDesignBtn" type="button" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/25 text-xs font-extrabold transition">
+              التصميم والمونتاج
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid Header -->
+      <div class="flex items-center justify-between gap-2 mb-3.5">
+        <div class="flex items-center gap-2">
+          <h2 id="activeCatTitle" class="text-sm sm:text-base font-black">جميع الخدمات</h2>
+          <span id="visibleCountBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300"></span>
+        </div>
+        <button id="resetFilterBtn" type="button" class="hidden text-xs font-extrabold text-indigo-600 dark:text-indigo-400 hover:underline">
+          عرض الكل
+        </button>
+      </div>
+
+      <!-- Services Grid -->
+      <div id="servicesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4"></div>
+
+      <!-- Empty Search State -->
+      <div id="emptySearch" class="hidden bg-white dark:bg-[#111827] rounded-3xl border border-slate-200 dark:border-slate-800 p-10 text-center mt-4">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+          <i data-lucide="search-x" class="w-7 h-7"></i>
+        </div>
+        <p class="text-sm font-extrabold">لم نجد خدمة مطابقة لبحثك</p>
+        <button id="emptyResetBtn" type="button" class="mt-4 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold transition">
+          عرض جميع الخدمات
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: Cart & Checkout -->
+    <section id="viewCart" class="hidden" aria-label="سلة الطلبات">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-7 bg-white dark:bg-[#111827] rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-black">سلة الاشتراكات</h2>
+            <button id="clearCartBtn" type="button" class="hidden text-xs font-bold text-rose-500 hover:underline">تفريغ السلة</button>
+          </div>
+
+          <div id="emptyCartState" class="py-12 px-4 text-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+              <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-sm font-extrabold">سلتك فارغة حالياً</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">اختر الاشتراك أو البرنامج الذي تحتاجه وأضفه للسلة</p>
+            <button id="goCatalogBtn" type="button" class="mt-4 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold transition">
+              تصفح الخدمات
+            </button>
+          </div>
+
+          <div id="cartItemsList" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
+        </div>
+
+        <div id="checkoutCard" class="hidden lg:col-span-5 bg-white dark:bg-[#111827] rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs h-fit">
+          <h3 class="text-base font-black mb-1">إتمام طلب الاشتراك</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">أدخل بياناتك لتفعيل الاشتراك والتواصل معك بالسعر وتفاصيل الدفع</p>
+          <form id="checkoutForm" class="space-y-3">
+            <div>
+              <label for="custName" class="block text-xs font-bold mb-1">الاسم *</label>
+              <input id="custName" type="text" required placeholder="مثال: أحمد محمد" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm outline-none" />
+            </div>
+            <div>
+              <label for="custPhone" class="block text-xs font-bold mb-1">رقم الواتساب *</label>
+              <input id="custPhone" type="tel" required placeholder="01xxxxxxxxx" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm outline-none" />
+            </div>
+            <div>
+              <label for="custEmail" class="block text-xs font-bold mb-1">البريد الإلكتروني للتفعيل (اختياري)</label>
+              <input id="custEmail" type="email" dir="ltr" placeholder="name@email.com" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-left outline-none" />
+            </div>
+            <div>
+              <label for="custNotes" class="block text-xs font-bold mb-1">ملاحظات (اختياري)</label>
+              <textarea id="custNotes" rows="2" placeholder="أي تفاصيل إضافية..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm outline-none resize-none"></textarea>
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-l from-indigo-600 to-violet-600 hover:opacity-95 text-white text-sm font-black shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-2">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              تأكيد وإرسال الطلب
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: My Orders History -->
+    <section id="viewOrders" class="hidden" aria-label="طلباتي">
+      <div class="mb-4">
+        <h2 class="text-base sm:text-lg font-black">سجل طلباتي</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400">تابع جميع طلبات الاشتراكات التي أرسلتها وانسخ تفاصيلها في أي وقت</p>
+      </div>
+      <div id="emptyOrdersState" class="bg-white dark:bg-[#111827] rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 p-10 text-center">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+          <i data-lucide="receipt-text" class="w-7 h-7"></i>
+        </div>
+        <h3 class="text-sm font-extrabold">لا توجد طلبات مسجلة بعد</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">عند إرسال أي طلب سيظهر هنا برقم الطلب والتفاصيل الكاملة</p>
+      </div>
+      <div id="ordersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+  </main>
+
+  <!-- Service Details & Plan Picker Modal -->
+  <div id="serviceModal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-xs modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="bg-white dark:bg-[#111827] w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 modal-sheet">
+      <div id="modalHero" class="relative p-6 text-white">
+        <button id="closeModalBtn" type="button" aria-label="إغلاق" class="absolute top-4 left-4 w-9 h-9 rounded-full bg-black/25 hover:bg-black/40 flex items-center justify-center text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div class="flex items-center gap-3.5">
+          <div id="modalBrandBadge" class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/25 flex items-center justify-center text-xl font-black shrink-0" dir="ltr"></div>
+          <div class="min-w-0">
+            <span id="modalCatLabel" class="inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-black/20 mb-1"></span>
+            <h3 id="modalTitle" class="text-lg font-black leading-tight" dir="ltr"></h3>
+            <p id="modalSubtitle" class="text-xs text-white/85 mt-0.5"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <!-- Features -->
+        <div>
+          <h4 class="text-xs font-extrabold text-slate-500 dark:text-slate-400 mb-2">مميزات الاشتراك:</h4>
+          <ul id="modalFeatures" class="space-y-1.5 text-xs font-semibold"></ul>
+        </div>
+
+        <!-- Duration Picker -->
+        <div>
+          <h4 class="text-xs font-extrabold text-slate-500 dark:text-slate-400 mb-2">اختر الباقة / المدة:</h4>
+          <div id="modalPlanOptions" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+        <!-- Activation Type -->
+        <div>
+          <h4 class="text-xs font-extrabold text-slate-500 dark:text-slate-400 mb-2">نوع التفعيل:</h4>
+          <div id="modalActivationOptions" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+        <!-- Add to Cart CTA -->
+        <div class="pt-2 flex items-center gap-2.5">
+          <div class="flex items-center border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900">
+            <button id="modalQtyMinus" type="button" class="w-10 h-11 flex items-center justify-center font-black hover:bg-slate-200 dark:hover:bg-slate-800 transition">-</button>
+            <span id="modalQtyVal" class="w-9 text-center text-sm font-black">1</span>
+            <button id="modalQtyPlus" type="button" class="w-10 h-11 flex items-center justify-center font-black hover:bg-slate-200 dark:hover:bg-slate-800 transition">+</button>
+          </div>
+          <button id="modalAddBtn" type="button" class="flex-1 py-3 rounded-xl bg-gradient-to-l from-indigo-600 to-violet-600 hover:opacity-95 text-white text-sm font-black shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-2">
+            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            أضف للسلة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Confirmed Modal -->
+  <div id="orderSuccessModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs modal-backdrop" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-[#111827] w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl border border-slate-200 dark:border-slate-800 modal-sheet">
+      <div class="w-16 h-16 mx-auto rounded-full bg-emerald-500/15 text-emerald-500 flex items-center justify-center mb-3">
+        <i data-lucide="check-circle-2" class="w-9 h-9"></i>
+      </div>
+      <h3 class="text-base font-black">تم تسجيل طلبك بنجاح!</h3>
+      <p id="successOrderCode" class="text-sm font-black text-indigo-600 dark:text-indigo-400 mt-1"></p>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">تم حفظ طلبك في قسم "طلباتي" ويمكنك نسخ ملخص الطلب لإرساله مباشرة على واتساب.</p>
+      <div class="mt-5 flex flex-col gap-2">
+        <button id="copySuccessOrderBtn" type="button" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          نسخ تفاصيل الطلب للواتساب
+        </button>
+        <button id="closeSuccessModalBtn" type="button" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-extrabold transition">
+          العودة للخدمات
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toastEl" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-extrabold px-4 py-2.5 rounded-full shadow-lg"></div>
+
+  <!-- Bottom Navigation -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-[#0d1321]/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800" aria-label="التنقل الرئيسي">
+    <div class="max-w-xl mx-auto grid grid-cols-3 h-16">
+      <button type="button" data-tab="catalog" class="nav-btn flex flex-col items-center justify-center gap-1 text-indigo-600 dark:text-indigo-400 font-extrabold transition">
+        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        <span class="text-[11px]">الخدمات</span>
+      </button>
+      <button type="button" data-tab="cart" class="nav-btn relative flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400 font-semibold transition">
+        <div class="relative">
+          <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+          <span id="cartBadge" class="hidden absolute -top-1.5 -left-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center">0</span>
+        </div>
+        <span class="text-[11px]">السلة</span>
+      </button>
+      <button type="button" data-tab="orders" class="nav-btn relative flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400 font-semibold transition">
+        <div class="relative">
+          <i data-lucide="receipt-text" class="w-5 h-5"></i>
+          <span id="ordersBadge" class="hidden absolute -top-1.5 -left-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center">0</span>
+        </div>
+        <span class="text-[11px]">طلباتي</span>
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    const CATEGORIES = [
+      { id: "all",      label: "الكل",               icon: "layout-grid" },
+      { id: "ai",       label: "الذكاء الاصطناعي",   icon: "sparkles" },
+      { id: "design",   label: "التصميم والمونتاج",  icon: "palette" },
+      { id: "business", label: "الأعمال والإنتاجية", icon: "briefcase" },
+      { id: "security", label: "الهندسة والحماية",   icon: "shield" }
+    ];
+    const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.label]));
+
+    const SERVICES = [
+      // AI Tools (9)
+      {
+        id: 1, name: "ChatGPT Plus", ar: "شات جي بي تي بلس", cat: "ai", mono: "GPT",
+        grad: "from-emerald-600 to-teal-700", badge: "الأكثر طلباً",
+        desc: "وصول كامل لأحدث نماذج GPT وتوليد الصور وتحليل الملفات",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["على إيميلك الشخصي", "حساب خاص جاهز"],
+        features: ["وصول لأحدث نماذج المحادثة المتقدمة", "تحليل الملفات والصور والبرمجة بسرعة عالية", "توليد صور احترافية مباشرة داخل المحادثة"]
+      },
+      {
+        id: 2, name: "Gemini AI Pro", ar: "جيميني برو من جوجل", cat: "ai", mono: "Gem",
+        grad: "from-blue-600 via-indigo-600 to-violet-600", badge: "مميز",
+        desc: "ذكاء اصطناعي متكامل من جوجل مع مساحة سحابية وتكامل كامل",
+        plans: ["شهري", "6 شهور", "سنوي"],
+        activations: ["على إيميلك الشخصي", "حساب خاص جاهز"],
+        features: ["أقوى نماذج Gemini للمهام المعقدة والبرمجة", "تكامل مباشر مع Gmail وDocs وDrive", "مساحة تخزين سحابية Google One"]
+      },
+      {
+        id: 3, name: "Midjourney", ar: "ميدجورني لتوليد الصور", cat: "ai", mono: "MJ",
+        grad: "from-slate-800 via-indigo-900 to-purple-900", badge: "احترافي",
+        desc: "أقوى أداة عالمية لتصميم وتوليد الصور الفنية والواقعية",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "تفعيل مباشر"],
+        features: ["توليد صور فائقة الواقعية بدقة عالية", "توليد سريع Fast Hours بدون انتظار", "مناسب للمصممين وصناع المحتوى"]
+      },
+      {
+        id: 4, name: "Perplexity Pro", ar: "بيربلكسيتي برو للبحث الذكي", cat: "ai", mono: "PPX",
+        grad: "from-cyan-600 to-teal-700", badge: "",
+        desc: "محرك بحث بالذكاء الاصطناعي مع مصادر موثقة ونماذج متعددة",
+        plans: ["شهري", "6 شهور", "سنوي"],
+        activations: ["على إيميلك الشخصي", "حساب خاص جاهز"],
+        features: ["بحث عميق Pro Search بمصادر حقيقية", "إمكانية التبديل بين أقوى نماذج الذكاء الاصطناعي", "رفع وتحليل ملفات PDF والبيانات"]
+      },
+      {
+        id: 5, name: "Runway ML", ar: "رانواي لصناعة الفيديو", cat: "ai", mono: "RW",
+        grad: "from-zinc-800 to-neutral-950", badge: "فيديو AI",
+        desc: "تحويل النصوص والصور إلى فيديوهات سينمائية بالذكاء الاصطناعي",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["توليد فيديوهات سينمائية بأحدث موديلات Gen", "تعديل المشاهد وإزالة العناصر بالذكاء الاصطناعي", "تصدير بجودة عالية بدون علامة مائية"]
+      },
+      {
+        id: 6, name: "Higgsfield AI (Highfield)", ar: "هيجزفيلد فيديو بالذكاء الاصطناعي", cat: "ai", mono: "HF",
+        grad: "from-fuchsia-600 to-purple-800", badge: "تريند",
+        desc: "صناعة فيديوهات احترافية وتحكم كامل في حركة الكاميرا والشخصيات",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["تحكم سينمائي في زوايا وحركة الكاميرا", "توليد لقطات إعلانية ومحتوى سوشيال ميديا", "سرعة معالجة وتصدير عالية"]
+      },
+      {
+        id: 7, name: "Leonardo.ai", ar: "ليوناردو لتوليد الصور والتصميم", cat: "ai", mono: "Leo",
+        grad: "from-purple-600 to-pink-600", badge: "",
+        desc: "منصة متكاملة لتصميم الشخصيات والصور والأصول الإبداعية",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["رصيد توكنز شهري ضخم للتوليد السريع", "توليد صور شفافة وعناصر تصميم وألعاب", "تحسين الجودة Upscale وتعديل فوري"]
+      },
+      {
+        id: 8, name: "OpenArt AI", ar: "أوبن آرت لتوليد الفن والصور", cat: "ai", mono: "OA",
+        grad: "from-rose-500 to-orange-600", badge: "",
+        desc: "إنشاء صور متناسقة الشخصيات وقصص مصورة بالذكاء الاصطناعي",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["ثبات ملامح الشخصية عبر عدة صور", "مكتبة ضخمة من الموديلات والأساليب الفنية", "أدوات تعديل وتلوين وتحسين تلقائي"]
+      },
+      {
+        id: 9, name: "Area AI", ar: "إيريا إيه آي للذكاء الاصطناعي", cat: "ai", mono: "AR",
+        grad: "from-sky-500 to-indigo-600", badge: "",
+        desc: "مساعد وأدوات ذكاء اصطناعي متقدمة لزيادة الإنتاجية والإبداع",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["وصول لمميزات الذكاء الاصطناعي الاحترافية", "تفعيل سريع وآمن طوال مدة الاشتراك", "دعم فني مستمر لأي استفسار"]
+      },
+
+      // Design & Video (5)
+      {
+        id: 10, name: "Adobe Creative Cloud", ar: "حزمة أدوبي الكاملة", cat: "design", mono: "Ai",
+        grad: "from-red-600 to-rose-700", badge: "الأكثر طلباً",
+        desc: "Photoshop, Premiere, After Effects, Illustrator وكل برامج أدوبي",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["على إيميلك الشخصي", "حساب خاص جاهز"],
+        features: ["أكثر من 20 برنامج أدوبي أصلي بتحديثات رسمية", "ميزة الذكاء الاصطناعي Generative Fill مفعّلة", "مساحة سحابية Adobe Cloud مرفقة"]
+      },
+      {
+        id: 11, name: "CapCut Pro", ar: "كاب كات برو للمونتاج", cat: "design", mono: "CC",
+        grad: "from-slate-800 to-slate-950", badge: "تريند",
+        desc: "مونتاج فيديوهات الريلز والتيك توك واليوتيوب بكل المؤثرات المدفوعة",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["فتح جميع الفلاتر والانتقالات والخطوط المدفوعة", "إزالة الخلفية والترجمة التلقائية بالذكاء الاصطناعي", "يعمل على الموبايل والكمبيوتر بدون علامة مائية"]
+      },
+      {
+        id: 12, name: "Canva Pro", ar: "كانفا برو للتصميم السريع", cat: "design", mono: "Cn",
+        grad: "from-cyan-500 via-sky-500 to-violet-600", badge: "مميز",
+        desc: "ملايين القوالب الجاهزة وإزالة الخلفية وتصميمات السوشيال ميديا",
+        plans: ["شهري", "6 شهور", "سنوي"],
+        activations: ["على إيميلك الشخصي", "دعوة فريق رسمية"],
+        features: ["فتح كل القوالب والصور والخطوط العربية المدفوعة", "تفريغ الخلفية بضغطة زر وتغيير المقاسات", "أدوات Magic Studio بالذكاء الاصطناعي"]
+      },
+      {
+        id: 13, name: "Freepik Premium", ar: "فري بيك بريميوم للمصممين", cat: "design", mono: "FP",
+        grad: "from-blue-600 to-sky-600", badge: "",
+        desc: "تحميل ملفات PSD وVector وصور عالية الجودة وأدوات AI",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["تحميل يومي مفتوح لملفات PSD وVectors وMockups", "استخدام تجاري بدون الحاجة لنسب المصدر", "الوصول لأدوات Freepik AI لتوليد الصور"]
+      },
+      {
+        id: 14, name: "Envato Elements", ar: "إنفاتو إليمنتس للموارد", cat: "design", mono: "Ev",
+        grad: "from-lime-600 to-emerald-700", badge: "",
+        desc: "مكتبة ضخمة من قوالب المونتاج والموشن جرافيك والصوتيات والخطوط",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["حساب خاص جاهز", "على إيميلك الشخصي"],
+        features: ["قوالب Premiere وAfter Effects وDaVinci جاهزة", "موسيقى ومؤثرات صوتية وفيديوهات Stock بدون حقوق", "قوالب مواقع WordPress وعروض PowerPoint"]
+      },
+
+      // Business & Productivity (4)
+      {
+        id: 15, name: "LinkedIn Business", ar: "لينكد إن بيزنس بريميوم", cat: "business", mono: "in",
+        grad: "from-sky-700 to-blue-800", badge: "",
+        desc: "تطوير الأعمال والتواصل المباشر مع صناع القرار والفرص الوظيفية",
+        plans: ["3 شهور", "6 شهور", "سنوي"],
+        activations: ["على إيميلك الشخصي", "رابط تفعيل رسمي"],
+        features: ["رسائل InMail مباشرة للتواصل مع أي شخص", "معرفة جميع زوار ملفك الشخصي وإحصائيات الشركات", "وصول كامل لدورات LinkedIn Learning"]
+      },
+      {
+        id: 16, name: "Microsoft Office 365", ar: "مايكروسوفت أوفيس 365 الأصلي", cat: "business", mono: "365",
+        grad: "from-orange-500 to-red-600", badge: "أصلي",
+        desc: "Word, Excel, PowerPoint, Outlook مع مساحة تخزين 1 تيرابايت",
+        plans: ["سنوي", "حساب دائم", "عائلي"],
+        activations: ["على إيميلك الشخصي", "حساب خاص جاهز"],
+        features: ["تفعيل أصلي على حتى 5 أجهزة (ويندوز/ماك/موبايل)", "مساحة سحابية 1TB على OneDrive", "تحديثات مايكروسوفت الرسمية المستمرة"]
+      },
+      {
+        id: 17, name: "Windows 10 / 11 Pro", ar: "تفعيل ويندوز 10 و 11 أصلي", cat: "business", mono: "Win",
+        grad: "from-blue-600 to-cyan-600", badge: "مدى الحياة",
+        desc: "مفتاح ترخيص أصلي Retail / OEM لتفعيل ويندوز 10 أو 11 برو",
+        plans: ["Windows 11 Pro", "Windows 10 Pro", "جهازين"],
+        activations: ["مفتاح تفعيل أصلي", "ربط بحساب مايكروسوفت"],
+        features: ["تفعيل رسمي 100% يقبل جميع التحديثات الأمنية", "مفتاح رقمي أصلي يصلك فوراً بعد الطلب", "يعمل بعد الفورمات بدون أي برامج كراك"]
+      },
+      {
+        id: 18, name: "Zoom Pro", ar: "زووم برو للاجتماعات", cat: "business", mono: "Zm",
+        grad: "from-blue-500 to-blue-700", badge: "",
+        desc: "اجتماعات أونلاين ممتدة بدون انقطاع الـ 40 دقيقة وتسجيل سحابي",
+        plans: ["شهري", "3 شهور", "سنوي"],
+        activations: ["على إيميلك الشخصي", "حساب خاص جاهز"],
+        features: ["اجتماعات غير محدودة المدة حتى 30 ساعة متواصلة", "استضافة حتى 100 مشارك في الاجتماع الواحد", "تسجيل سحابي وتقارير حضور للمحاضرات والكورسات"]
+      },
+
+      // Engineering & Security (3)
+      {
+        id: 19, name: "Autodesk All Apps", ar: "برامج أوتوديسك الهندسية", cat: "security", mono: "AD",
+        grad: "from-teal-600 to-slate-800", badge: "هندسي",
+        desc: "AutoCAD, 3ds Max, Revit, Maya, Civil 3D بترخيص رسمي",
+        plans: ["سنوي", "3 سنوات", "برنامج محدد"],
+        activations: ["على إيميلك الشخصي", "تفعيل رسمي"],
+        features: ["تفعيل رسمي على حسابك في موقع Autodesk", "يشمل AutoCAD وRevit و3ds Max وMaya", "بدون كراك وبأحدث إصدارات 2025/2026"]
+      },
+      {
+        id: 20, name: "Kaspersky", ar: "كاسبرسكي للحماية والأمان", cat: "security", mono: "K",
+        grad: "from-emerald-600 to-green-800", badge: "حماية",
+        desc: "أقوى حماية ضد الفيروسات وبرامج الفدية وحماية المدفوعات",
+        plans: ["سنة (جهاز)", "سنة (3 أجهزة)", "سنتين"],
+        activations: ["مفتاح تفعيل أصلي", "على حسابك"],
+        features: ["حماية فورية ضد الفيروسات والاختراق وبرامج الفدية", "خفيف على الجهاز ولا يبطئ الأداء", "تفعيل أصلي رسمي للويندوز والأندرويد والماك"]
+      },
+      {
+        id: 21, name: "Avast Premium Security", ar: "أفاست بريميوم للحماية", cat: "security", mono: "Av",
+        grad: "from-orange-500 to-amber-600", badge: "حماية",
+        desc: "حماية شاملة للجهاز وجدار ناري متقدم وتصفح آمن",
+        plans: ["سنة (جهاز)", "سنة (متعدد)", "سنتين"],
+        activations: ["مفتاح تفعيل أصلي", "تفعيل مباشر"],
+        features: ["جدار حماية متطور لمنع التطفل والروابط الخبيثة", "حماية الكاميرا والملفات الشخصية من التجسس", "تحديثات تلقائية لقاعدة بيانات الفيروسات"]
+      }
+    ];
+
+    const STORAGE_KEY = "digital_services_orders_v1";
+    const state = {
+      activeTab: "catalog",
+      activeCategory: "all",
+      searchQuery: "",
+      cart: [],   // [{ key, serviceId, name, mono, grad, plan, activation, qty }]
+      orders: [],
+      selectedService: null,
+      selectedPlan: "",
+      selectedActivation: "",
+      modalQty: 1,
+      lastOrder: null
+    };
+
+    try {
+      const savedOrders = localStorage.getItem(STORAGE_KEY);
+      if (savedOrders) {
+        const parsed = JSON.parse(savedOrders);
+        if (Array.isArray(parsed)) state.orders = parsed;
+      }
+    } catch (_) {}
+
+    function persistOrders() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.orders)); } catch (_) {}
+    }
+
+    function escapeHtml(s) {
+      return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toastEl");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.add("hidden"), 2100);
+    }
+
+    function copyTextSafe(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast("تم نسخ تفاصيل الطلب")).catch(() => fallbackCopy(text));
+      } else fallbackCopy(text);
+    }
+    function fallbackCopy(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); showToast("تم نسخ تفاصيل الطلب"); } catch (_) {}
+      document.body.removeChild(ta);
+    }
+
+    function formatOrderText(o) {
+      return [
+        `طلب اشتراك جديد ${o.code}`,
+        `الاسم: ${o.customerName}`,
+        `الواتساب: ${o.phone}`,
+        o.email ? `إيميل التفعيل: ${o.email}` : "",
+        o.notes ? `ملاحظات: ${o.notes}` : "",
+        "الخدمات المطلوبة:",
+        ...o.items.map(it => `- ${it.name} (${it.plan} • ${it.activation}) × ${it.qty}`)
+      ].filter(Boolean).join("\n");
+    }
+
+    function updateBadges() {
+      const cartQty = state.cart.reduce((s, it) => s + it.qty, 0);
+      const cb = document.getElementById("cartBadge");
+      cb.textContent = cartQty;
+      cb.classList.toggle("hidden", cartQty === 0);
+
+      const ob = document.getElementById("ordersBadge");
+      ob.textContent = state.orders.length;
+      ob.classList.toggle("hidden", state.orders.length === 0);
+    }
+
+    function renderCategoryPills() {
+      const counts = { all: SERVICES.length };
+      SERVICES.forEach(s => { counts[s.cat] = (counts[s.cat] || 0) + 1; });
+
+      document.getElementById("categoryPills").innerHTML = CATEGORIES.map(c => {
+        const active = state.activeCategory === c.id;
+        return `
+          <button
+            type="button"
+            data-cat="${c.id}"
+            class="cat-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold border transition whitespace-nowrap ${
+              active
+                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-indigo-500"
+            }"
+          >
+            <span>${c.label}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full ${active ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"}">${counts[c.id] || 0}</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function renderServices() {
+      const q = state.searchQuery.trim().toLowerCase();
+      const filtered = SERVICES.filter(s => {
+        if (state.activeCategory !== "all" && s.cat !== state.activeCategory) return false;
+        if (!q) return true;
+        return s.name.toLowerCase().includes(q)
+          || s.ar.toLowerCase().includes(q)
+          || s.desc.toLowerCase().includes(q)
+          || (CAT_MAP[s.cat] || "").toLowerCase().includes(q);
+      });
+
+      document.getElementById("activeCatTitle").textContent = state.activeCategory === "all" ? "جميع الخدمات" : CAT_MAP[state.activeCategory];
+      document.getElementById("visibleCountBadge").textContent = `${filtered.length} خدمة`;
+      document.getElementById("resetFilterBtn").classList.toggle("hidden", state.activeCategory === "all" && !q);
+
+      const grid = document.getElementById("servicesGrid");
+      const empty = document.getElementById("emptySearch");
+
+      if (filtered.length === 0) {
+        grid.innerHTML = "";
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      grid.innerHTML = filtered.map(s => `
+        <div
+          data-service-id="${s.id}"
+          class="service-card group bg-white dark:bg-[#111827] rounded-3xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500/60 dark:hover:border-indigo-500/60 shadow-xs hover:shadow-xl hover:shadow-indigo-950/15 overflow-hidden flex flex-col cursor-pointer"
+        >
+          <div class="p-4 pb-3 bg-gradient-to-br ${s.grad} text-white relative">
+            ${s.badge ? `<span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-black/25 backdrop-blur-xs border border-white/20">${escapeHtml(s.badge)}</span>` : ""}
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/25 flex items-center justify-center text-base font-black shrink-0" dir="ltr">
+                ${escapeHtml(s.mono)}
+              </div>
+              <div class="min-w-0 pl-12">
+                <h3 class="text-sm sm:text-base font-black leading-tight truncate text-right" dir="ltr">${escapeHtml(s.name)}</h3>
+                <p class="text-[11px] text-white/85 font-semibold truncate mt-0.5">${escapeHtml(s.ar)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between gap-3">
+            <div>
+              <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">${escapeHtml(s.desc)}</p>
+              <div class="flex flex-wrap gap-1.5 mt-3">
+                ${s.plans.map(pl => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300">${escapeHtml(pl)}</span>`).join("")}
+              </div>
+            </div>
+
+            <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+              <span class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400">${CAT_MAP[s.cat]}</span>
+              <button
+                type="button"
+                data-open-service="${s.id}"
+                class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold transition"
+              >
+                اختيار الباقة
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderCart() {
+      const empty = document.getElementById("emptyCartState");
+      const list = document.getElementById("cartItemsList");
+      const checkout = document.getElementById("checkoutCard");
+      const clearBtn = document.getElementById("clearCartBtn");
+
+      if (state.cart.length === 0) {
+        empty.classList.remove("hidden");
+        list.innerHTML = "";
+        checkout.classList.add("hidden");
+        clearBtn.classList.add("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      checkout.classList.remove("hidden");
+      clearBtn.classList.remove("hidden");
+
+      list.innerHTML = state.cart.map((it, idx) => `
+        <div class="py-3.5 flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${it.grad} text-white font-black text-xs flex items-center justify-center shrink-0" dir="ltr">
+            ${escapeHtml(it.mono)}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-black truncate" dir="ltr">${escapeHtml(it.name)}</h4>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">${escapeHtml(it.plan)} • ${escapeHtml(it.activation)}</p>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" data-cdec="${idx}" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-black">-</button>
+            <span class="w-6 text-center text-xs font-black">${it.qty}</span>
+            <button type="button" data-cinc="${idx}" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-black">+</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderOrders() {
+      const empty = document.getElementById("emptyOrdersState");
+      const list = document.getElementById("ordersList");
+      if (state.orders.length === 0) {
+        empty.classList.remove("hidden");
+        list.innerHTML = "";
+        return;
+      }
+      empty.classList.add("hidden");
+      list.innerHTML = state.orders.map(o => `
+        <article class="bg-white dark:bg-[#111827] rounded-3xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs">
+          <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+            <span class="text-sm font-black text-indigo-600 dark:text-indigo-400" dir="ltr">${escapeHtml(o.code)}</span>
+            <span class="text-[11px] text-slate-400 font-semibold">${escapeHtml(o.createdAt)}</span>
+          </div>
+          <div class="py-2.5 text-xs space-y-1 text-slate-600 dark:text-slate-300">
+            <div><span class="text-slate-400">الاسم: </span><strong>${escapeHtml(o.customerName)}</strong></div>
+            <div><span class="text-slate-400">الواتساب: </span><strong dir="ltr">${escapeHtml(o.phone)}</strong></div>
+            ${o.email ? `<div><span class="text-slate-400">إيميل التفعيل: </span><strong dir="ltr">${escapeHtml(o.email)}</strong></div>` : ""}
+          </div>
+          <ul class="bg-slate-50 dark:bg-slate-900 rounded-2xl p-3 space-y-1.5 text-xs mb-3">
+            ${o.items.map(it => `<li class="flex items-center justify-between gap-2"><span class="font-bold">${escapeHtml(it.name)} (${escapeHtml(it.plan)})</span><span class="font-black text-indigo-600 dark:text-indigo-400">× ${it.qty}</span></li>`).join("")}
+          </ul>
+          <button type="button" data-copy-order="${o.id}" class="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-xs font-extrabold transition">
+            نسخ تفاصيل الطلب
+          </button>
+        </article>
+      `).join("");
+    }
+
+    function switchTab(tab) {
+      state.activeTab = tab;
+      document.getElementById("viewCatalog").classList.toggle("hidden", tab !== "catalog");
+      document.getElementById("viewCart").classList.toggle("hidden", tab !== "cart");
+      document.getElementById("viewOrders").classList.toggle("hidden", tab !== "orders");
+
+      const showSearch = tab === "catalog";
+      document.getElementById("searchWrap").classList.toggle("hidden", !showSearch);
+      document.getElementById("catBarWrap").classList.toggle("hidden", !showSearch);
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        const active = btn.dataset.tab === tab;
+        btn.classList.toggle("text-indigo-600", active);
+        btn.classList.toggle("dark:text-indigo-400", active);
+        btn.classList.toggle("font-extrabold", active);
+        btn.classList.toggle("text-slate-500", !active);
+        btn.classList.toggle("dark:text-slate-400", !active);
+      });
+
+      if (tab === "catalog") renderServices();
+      if (tab === "cart") renderCart();
+      if (tab === "orders") renderOrders();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderModalSelections() {
+      const s = state.selectedService;
+      if (!s) return;
+      document.getElementById("modalPlanOptions").innerHTML = s.plans.map(pl => {
+        const active = state.selectedPlan === pl;
+        return `<button type="button" data-pick-plan="${escapeHtml(pl)}" class="py-2 px-2 rounded-xl text-xs font-extrabold border transition ${active ? "bg-indigo-600 text-white border-indigo-600" : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-indigo-500"}">${escapeHtml(pl)}</button>`;
+      }).join("");
+
+      document.getElementById("modalActivationOptions").innerHTML = s.activations.map(ac => {
+        const active = state.selectedActivation === ac;
+        return `<button type="button" data-pick-act="${escapeHtml(ac)}" class="py-2 px-2 rounded-xl text-xs font-extrabold border transition ${active ? "bg-indigo-600 text-white border-indigo-600" : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-indigo-500"}">${escapeHtml(ac)}</button>`;
+      }).join("");
+    }
+
+    function openServiceModal(id) {
+      const s = SERVICES.find(x => x.id === id);
+      if (!s) return;
+      state.selectedService = s;
+      state.selectedPlan = s.plans[0];
+      state.selectedActivation = s.activations[0];
+      state.modalQty = 1;
+
+      document.getElementById("modalHero").className = `relative p-6 text-white bg-gradient-to-br ${s.grad}`;
+      document.getElementById("modalBrandBadge").textContent = s.mono;
+      document.getElementById("modalCatLabel").textContent = CAT_MAP[s.cat];
+      document.getElementById("modalTitle").textContent = s.name;
+      document.getElementById("modalSubtitle").textContent = s.ar;
+      document.getElementById("modalQtyVal").textContent = "1";
+      document.getElementById("modalFeatures").innerHTML = s.features.map(f => `<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span><span>${escapeHtml(f)}</span></li>`).join("");
+
+      renderModalSelections();
+      document.getElementById("serviceModal").classList.remove("hidden");
+    }
+
+    function closeServiceModal() {
+      document.getElementById("serviceModal").classList.add("hidden");
+      state.selectedService = null;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateBadges();
+      renderCategoryPills();
+      renderServices();
+      if (window.lucide) lucide.createIcons();
+
+      // Theme toggle
+      document.getElementById("themeToggleBtn").addEventListener("click", () => {
+        document.documentElement.classList.toggle("dark");
+      });
+
+      // Category pills & hero shortcuts
+      document.getElementById("categoryPills").addEventListener("click", (e) => {
+        const btn = e.target.closest(".cat-pill");
+        if (!btn) return;
+        state.activeCategory = btn.dataset.cat;
+        renderCategoryPills();
+        renderServices();
+      });
+      document.getElementById("heroAiBtn").addEventListener("click", () => {
+        state.activeCategory = "ai";
+        renderCategoryPills();
+        renderServices();
+      });
+      document.getElementById("heroDesignBtn").addEventListener("click", () => {
+        state.activeCategory = "design";
+        renderCategoryPills();
+        renderServices();
+      });
+
+      // Search
+      const searchInput = document.getElementById("searchInput");
+      const clearBtn = document.getElementById("clearSearchBtn");
+      searchInput.addEventListener("input", () => {
+        state.searchQuery = searchInput.value;
+        clearBtn.classList.toggle("hidden", !state.searchQuery);
+        renderServices();
+      });
+      clearBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        state.searchQuery = "";
+        clearBtn.classList.add("hidden");
+        renderServices();
+        searchInput.focus();
+      });
+      const resetAll = () => {
+        state.activeCategory = "all";
+        state.searchQuery = "";
+        searchInput.value = "";
+        clearBtn.classList.add("hidden");
+        renderCategoryPills();
+        renderServices();
+      };
+      document.getElementById("resetFilterBtn").addEventListener("click", resetAll);
+      document.getElementById("emptyResetBtn").addEventListener("click", resetAll);
+
+      // Service card click
+      document.getElementById("servicesGrid").addEventListener("click", (e) => {
+        const card = e.target.closest("[data-service-id]");
+        if (card) openServiceModal(Number(card.dataset.serviceId));
+      });
+
+      // Modal events
+      document.getElementById("closeModalBtn").addEventListener("click", closeServiceModal);
+      document.getElementById("serviceModal").addEventListener("click", (e) => {
+        if (e.target.id === "serviceModal") closeServiceModal();
+      });
+      document.getElementById("modalPlanOptions").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-pick-plan]");
+        if (b) { state.selectedPlan = b.dataset.pickPlan; renderModalSelections(); }
+      });
+      document.getElementById("modalActivationOptions").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-pick-act]");
+        if (b) { state.selectedActivation = b.dataset.pickAct; renderModalSelections(); }
+      });
+      document.getElementById("modalQtyMinus").addEventListener("click", () => {
+        if (state.modalQty > 1) { state.modalQty--; document.getElementById("modalQtyVal").textContent = state.modalQty; }
+      });
+      document.getElementById("modalQtyPlus").addEventListener("click", () => {
+        state.modalQty++; document.getElementById("modalQtyVal").textContent = state.modalQty;
+      });
+      document.getElementById("modalAddBtn").addEventListener("click", () => {
+        const s = state.selectedService;
+        if (!s) return;
+        const key = `${s.id}|${state.selectedPlan}|${state.selectedActivation}`;
+        const existing = state.cart.find(x => x.key === key);
+        if (existing) existing.qty += state.modalQty;
+        else state.cart.push({ key, serviceId: s.id, name: s.name, mono: s.mono, grad: s.grad, plan: state.selectedPlan, activation: state.selectedActivation, qty: state.modalQty });
+        updateBadges();
+        closeServiceModal();
+        showToast(`تمت إضافة ${s.name} للسلة`);
+      });
+
+      // Cart controls
+      document.getElementById("cartItemsList").addEventListener("click", (e) => {
+        const inc = e.target.closest("[data-cinc]");
+        const dec = e.target.closest("[data-cdec]");
+        if (inc) {
+          state.cart[Number(inc.dataset.cinc)].qty++;
+          updateBadges(); renderCart();
+        } else if (dec) {
+          const i = Number(dec.dataset.cdec);
+          if (state.cart[i].qty <= 1) state.cart.splice(i, 1);
+          else state.cart[i].qty--;
+          updateBadges(); renderCart();
+        }
+      });
+      document.getElementById("clearCartBtn").addEventListener("click", () => {
+        state.cart = [];
+        updateBadges(); renderCart();
+        showToast("تم تفريغ السلة");
+      });
+      document.getElementById("goCatalogBtn").addEventListener("click", () => switchTab("catalog"));
+
+      // Checkout submit
+      document.getElementById("checkoutForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (state.cart.length === 0) return;
+        const order = {
+          id: Date.now(),
+          code: `#DS-${1001 + state.orders.length}`,
+          customerName: document.getElementById("custName").value.trim(),
+          phone: document.getElementById("custPhone").value.trim(),
+          email: document.getElementById("custEmail").value.trim(),
+          notes: document.getElementById("custNotes").value.trim(),
+          items: state.cart.map(it => ({ name: it.name, plan: it.plan, activation: it.activation, qty: it.qty })),
+          createdAt: new Date().toLocaleString("ar-EG", { dateStyle: "short", timeStyle: "short" })
+        };
+        state.orders.unshift(order);
+        state.lastOrder = order;
+        persistOrders();
+        state.cart = [];
+        document.getElementById("checkoutForm").reset();
+        updateBadges();
+        renderCart();
+        document.getElementById("successOrderCode").textContent = `رقم الطلب: ${order.code}`;
+        document.getElementById("orderSuccessModal").classList.remove("hidden");
+      });
+
+      document.getElementById("copySuccessOrderBtn").addEventListener("click", () => {
+        if (state.lastOrder) copyTextSafe(formatOrderText(state.lastOrder));
+      });
+      document.getElementById("closeSuccessModalBtn").addEventListener("click", () => {
+        document.getElementById("orderSuccessModal").classList.add("hidden");
+        switchTab("catalog");
+      });
+
+      // Orders copy
+      document.getElementById("ordersList").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-copy-order]");
+        if (!b) return;
+        const o = state.orders.find(x => x.id === Number(b.dataset.copyOrder));
+        if (o) copyTextSafe(formatOrderText(o));
+      });
+
+      // Bottom nav
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeServiceModal();
+          document.getElementById("orderSuccessModal").classList.add("hidden");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
